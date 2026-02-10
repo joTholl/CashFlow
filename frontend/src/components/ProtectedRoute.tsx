@@ -4,7 +4,7 @@ type ProtectedRouteProps = {
     user: string | undefined | null
 }
 
-export default function ProtectedRoute({user}: ProtectedRouteProps) {
+export default function ProtectedRoute({user}: Readonly<ProtectedRouteProps>) {
     if (user === undefined) {
         return <h3>Loading...</h3>;
     }

@@ -10,7 +10,6 @@ import Logout from "./components/Logout.tsx";
 
 function App() {
     const [user, setUser] = useState<string | undefined | null>(undefined)
-    console.log("User:" + user)
     return (
         <>
             <Navbar/>
