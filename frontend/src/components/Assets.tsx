@@ -6,9 +6,10 @@ type AssetProps = {
 }
 
 export default function Assets({assets}: Readonly<AssetProps>) {
+    const sortedAssets = assets.sort((a, b) => b.cost - a.cost)
     return (
         <>
-            {assets.sort((a, b) => b.cost - a.cost).map(asset => <AssetCard key={asset.ticker} asset={asset}/>)}
+            {sortedAssets.map(asset => <AssetCard key={asset.ticker} asset={asset}/>)}
         </>
     )
 
