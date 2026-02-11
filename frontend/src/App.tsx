@@ -7,18 +7,22 @@ import Dashboard from "./components/Dashboard.tsx";
 import Navbar from "./components/Navbar.tsx";
 import Home from "./components/Home.tsx";
 import Logout from "./components/Logout.tsx";
+import type {AppUser} from "./models/AppUser.ts";
 
 function App() {
     const [user, setUser] = useState<string | undefined | null>(undefined)
+    const [appUser, setAppUser] = useState<AppUser>({
+        id:"", userName: "", assets:[]
+    });
     return (
         <>
             <Navbar/>
-            <Login setUser={setUser}/>
+            <Login setUser={setUser} setAppUser={setAppUser}/>
             <Routes>
                 <Route path="/" element={<Home/>}/>
                 <Route path="/logout" element={<Logout/>}/>
                 <Route element={<ProtectedRoute user={user}/>}>
-                    <Route path="/dashboard" element={<Dashboard user={user}/>}/>
+                    <Route path="/dashboard" element={<Dashboard user={appUser}/>}/>
                 </Route>
             </Routes>
 

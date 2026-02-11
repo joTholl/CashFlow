@@ -18,6 +18,6 @@ public class AppUserController {
 
     @GetMapping
     public AppUserOutDto getAppUser(@AuthenticationPrincipal OAuth2User user) {
-        return appUserService.getAppUser(user.getAttribute("client_id"));
+        return appUserService.getAppUser(user.getAttribute("id").toString());
     }
 }

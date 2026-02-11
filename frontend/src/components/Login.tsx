@@ -1,12 +1,14 @@
 import axios from "axios";
 import {type Dispatch, type SetStateAction, useEffect} from "react";
+import type {AppUser} from "../models/AppUser.ts";
 
 
 type LoginProps = {
     setUser: Dispatch<SetStateAction<string | undefined | null>>;
+    setAppUser: Dispatch<SetStateAction<AppUser>>;
 };
 
-export default function Login({setUser}: Readonly<LoginProps>) {
+export default function Login({setUser, setAppUser}: Readonly<LoginProps>) {
     const host: string = globalThis.location.host === "localhost:5173" ? "http://localhost:8080" : globalThis.location.origin;
 
     function loginUser() {
@@ -18,7 +20,10 @@ export default function Login({setUser}: Readonly<LoginProps>) {
     }
 
     const loadUser = () => {
-        axios.get("/api/auth").then((response) => setUser(response.data))
+        axios.get("/api/auth").then((response) => {
+            setUser(response.data);
+            axios.get("api/appuser").then(response => setAppUser(response.data))
+        })
             .catch(() => setUser(null))
     }
 
