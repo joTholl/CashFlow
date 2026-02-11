@@ -1,4 +1,8 @@
 package org.example.backend.models;
 
-public record AppUser(String id, String username) {
+import org.springframework.data.annotation.Id;
+
+import java.util.List;
+
+public record AppUser(@Id String id, String username, List<Asset> assets) {
 }

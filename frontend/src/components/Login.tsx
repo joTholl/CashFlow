@@ -1,25 +1,29 @@
 import axios from "axios";
 import {type Dispatch, type SetStateAction, useEffect} from "react";
+import type {AppUser} from "../models/AppUser.ts";
 
 
 type LoginProps = {
     setUser: Dispatch<SetStateAction<string | undefined | null>>;
+    setAppUser: Dispatch<SetStateAction<AppUser>>;
 };
 
-export default function Login({setUser}: LoginProps) {
+export default function Login({setUser, setAppUser}: Readonly<LoginProps>) {
+    const host: string = globalThis.location.host === "localhost:5173" ? "http://localhost:8080" : globalThis.location.origin;
 
     function loginUser() {
-        const host: string = window.location.host === "localhost:5173" ? "http://localhost:8080" : window.location.origin;
-        window.open(host + "/oauth2/authorization/github", "_self")
+        globalThis.open(host + "/oauth2/authorization/github", "_self")
     }
 
     function logoutUser() {
-        const host: string = window.location.host === "localhost:5173" ? "http://localhost:8080" : window.location.origin;
-        window.open(host + "/logout", "_self")
+        globalThis.open(host + "/logout", "_self")
     }
 
     const loadUser = () => {
-        axios.get("/api/auth").then((response) => setUser(response.data))
+        axios.get("/api/auth").then((response) => {
+            setUser(response.data);
+            axios.get("api/appuser").then(response => setAppUser(response.data))
+        })
             .catch(() => setUser(null))
     }
 

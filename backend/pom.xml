@@ -28,9 +28,14 @@
     </scm>
     <properties>
         <java.version>25</java.version>
-        <sonar.organization>jonas-tholl</sonar.organization>
+        <sonar.organization>jotholl</sonar.organization>
     </properties>
     <dependencies>
+        <dependency>
+            <groupId>com.yahoofinance-api</groupId>
+            <artifactId>YahooFinanceAPI</artifactId>
+            <version>3.17.0</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-mongodb</artifactId>
