@@ -12,7 +12,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oidcLogin;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -50,7 +49,7 @@ class AppUserControllerTest {
     @Test
     void getAppUser_shouldReturnAppUser() throws Exception {
         mockMvc.perform(get("/api/appuser")
-                        .with(oidcLogin().userInfoToken(token-> token.claim("client_id", "abc"))))
+                        .with(oidcLogin().userInfoToken(token-> token.claim("id", "abc"))))
                 .andExpect(status().isOk())
                 .andExpect(content().json(appUserOut1JSON));
     }
@@ -58,7 +57,7 @@ class AppUserControllerTest {
     @Test
     void getAppUser_shouldReturnError401() throws Exception {
         mockMvc.perform(get("/api/appuser")
-                .with(oidcLogin().userInfoToken(token-> token.claim("client_id", "hsdh"))))
+                .with(oidcLogin().userInfoToken(token-> token.claim("id", "hsdh"))))
                 .andExpect(status().isUnauthorized());
     }
 }
