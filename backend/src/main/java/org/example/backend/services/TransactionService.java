@@ -18,7 +18,7 @@ public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final HelperService helperService;
     private final AppUserService appUserService;
-    static private final String TRANSACTION_NOT_FOUND = "Transaction not found";
+    private static final String TRANSACTION_NOT_FOUND = "Transaction not found";
 
 
     public List<TransactionOutDto> getAllTransactions() {
