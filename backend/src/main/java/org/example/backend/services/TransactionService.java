@@ -16,9 +16,9 @@ import java.util.NoSuchElementException;
 public class TransactionService {
 
     private final TransactionRepository transactionRepository;
-    private final IdService idService;
+    private final HelperService helperService;
     private final AppUserService appUserService;
-    private final String transactionNotFound = "Transaction not found";
+    private final static String transactionNotFound = "Transaction not found";
 
 
     public List<TransactionOutDto> getAllTransactions() {
@@ -35,7 +35,7 @@ public class TransactionService {
     }
 
     public TransactionOutDto addTransaction(TransactionInDto tid, String userId) {
-        Transaction transaction = transactionRepository.save(new Transaction(idService.getRandomId(), tid));
+        Transaction transaction = transactionRepository.save(new Transaction(helperService.getRandomId(), tid));
         appUserService.addTransaction(transaction, userId);
         return new TransactionOutDto(transaction);
     }
@@ -43,8 +43,8 @@ public class TransactionService {
     public TransactionOutDto updateTransaction(String transactionId, TransactionInDto tid, String userId) {
         Transaction transaction = transactionRepository.findById(transactionId).orElseThrow(() -> new NoSuchElementException(transactionNotFound));
         Transaction updateTransaction = new Transaction(transactionId, tid);
-        if (transaction.ticker().equals(tid.ticker()) && !transaction.assetname().equals(tid.assetname()) ||
-                !transaction.ticker().equals(tid.ticker()) && transaction.assetname().equals(tid.assetname())) {
+        if (transaction.ticker().equals(tid.ticker()) && !transaction.assetName().equals(tid.assetName()) ||
+                !transaction.ticker().equals(tid.ticker()) && transaction.assetName().equals(tid.assetName())) {
             throw new IllegalArgumentException("Ticker and Assetname have both to change or none of them!");
         } else {
             appUserService.subtractTransaction(transaction, userId);

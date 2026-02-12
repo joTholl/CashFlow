@@ -35,8 +35,7 @@ public class TransactionController {
     }
 
     @PutMapping("/{id}")
-    @ResponseStatus(HttpStatus.CREATED)
-    public TransactionOutDto addTransaction(@PathVariable String id, @RequestBody TransactionInDto tid, @AuthenticationPrincipal OAuth2User user) {
+    public TransactionOutDto updateTransaction(@PathVariable String id, @RequestBody TransactionInDto tid, @AuthenticationPrincipal OAuth2User user) {
         return transactionService.updateTransaction(id, tid, user.getAttribute("id").toString());
     }
 
