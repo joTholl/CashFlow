@@ -18,7 +18,7 @@ public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final HelperService helperService;
     private final AppUserService appUserService;
-    private final static String transactionNotFound = "Transaction not found";
+    static private final String TRANSACTION_NOT_FOUND = "Transaction not found";
 
 
     public List<TransactionOutDto> getAllTransactions() {
@@ -31,7 +31,7 @@ public class TransactionService {
     }
 
     public TransactionOutDto getTransactionById(String id) {
-        return new TransactionOutDto(transactionRepository.findById(id).orElseThrow(() -> new NoSuchElementException(transactionNotFound)));
+        return new TransactionOutDto(transactionRepository.findById(id).orElseThrow(() -> new NoSuchElementException(TRANSACTION_NOT_FOUND)));
     }
 
     public TransactionOutDto addTransaction(TransactionInDto tid, String userId) {
@@ -41,7 +41,7 @@ public class TransactionService {
     }
 
     public TransactionOutDto updateTransaction(String transactionId, TransactionInDto tid, String userId) {
-        Transaction transaction = transactionRepository.findById(transactionId).orElseThrow(() -> new NoSuchElementException(transactionNotFound));
+        Transaction transaction = transactionRepository.findById(transactionId).orElseThrow(() -> new NoSuchElementException(TRANSACTION_NOT_FOUND));
         Transaction updateTransaction = new Transaction(transactionId, tid);
         if (transaction.ticker().equals(tid.ticker()) && !transaction.assetName().equals(tid.assetName()) ||
                 !transaction.ticker().equals(tid.ticker()) && transaction.assetName().equals(tid.assetName())) {
@@ -54,7 +54,7 @@ public class TransactionService {
     }
 
     public void deleteTransaction(String transactionId, String userId) {
-        Transaction transaction = transactionRepository.findById(transactionId).orElseThrow(() -> new NoSuchElementException(transactionNotFound));
+        Transaction transaction = transactionRepository.findById(transactionId).orElseThrow(() -> new NoSuchElementException(TRANSACTION_NOT_FOUND));
         appUserService.subtractTransaction(transaction, userId);
         transactionRepository.deleteById(transactionId);
     }
