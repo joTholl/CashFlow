@@ -39,6 +39,7 @@ class TransactionControllerTest {
 
     private final String transaction1JSON = """
             {
+                "id": "zyx",
                 "ticker": "BTC",
                 "assetName": "Bitcoin",
                 "cost": 100,
@@ -64,6 +65,7 @@ class TransactionControllerTest {
                 .andExpect(MockMvcResultMatchers.content().json("""
                         [
                           {
+                            "id": "zyx",
                             "ticker": "BTC",
                             "assetName": "Bitcoin",
                             "cost": 100,
@@ -72,6 +74,7 @@ class TransactionControllerTest {
                             "fee": 0.1
                           },
                           {
+                            "id": "abc",
                             "ticker": "ETH",
                             "assetName": "Ethereum",
                             "cost": 1000,
@@ -104,7 +107,13 @@ class TransactionControllerTest {
                         .with(oidcLogin().userInfoToken(token -> token.claim("id", "abc")))
                         .contentType(APPLICATION_JSON).content(transaction1JSON))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
-                .andExpect(MockMvcResultMatchers.content().json(transaction1JSON));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").exists())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.ticker").value("BTC"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.assetName").value("Bitcoin"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.cost").value(100))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.fee").value(0.1))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.timestamp").value("2026-02-12T10:00:00Z"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.shares").value(0.001));
     }
 
     @Test
@@ -118,6 +127,7 @@ class TransactionControllerTest {
     void updateTransaction_shouldUpdateTransaction() throws Exception {
         String newTransactionJSON = """
                 {
+                      "id": "zyx",
                       "ticker": "LTC",
                       "assetName": "Litecoin",
                       "cost": 100,

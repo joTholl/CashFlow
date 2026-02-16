@@ -1,14 +1,11 @@
-import axios from "axios";
-import {type Dispatch, type SetStateAction, useEffect} from "react";
-import type {AppUser} from "../models/AppUser.ts";
-
+import {useEffect} from "react";
 
 type LoginProps = {
-    setUser: Dispatch<SetStateAction<string | undefined | null>>;
-    setAppUser: Dispatch<SetStateAction<AppUser>>;
+    user: string | undefined | null;
+    loadUser: () => void;
 };
 
-export default function Login({setUser, setAppUser}: Readonly<LoginProps>) {
+export default function Login({user, loadUser}: Readonly<LoginProps>) {
     const host: string = globalThis.location.host === "localhost:5173" ? "http://localhost:8080" : globalThis.location.origin;
 
     function loginUser() {
@@ -19,23 +16,12 @@ export default function Login({setUser, setAppUser}: Readonly<LoginProps>) {
         globalThis.open(host + "/logout", "_self")
     }
 
-    const loadUser = () => {
-        axios.get("/api/auth").then((response) => {
-            setUser(response.data);
-            axios.get("api/appuser").then(response => setAppUser(response.data))
-        })
-            .catch(() => setUser(null))
-    }
-
     useEffect(() => {
-        loadUser()
+        loadUser();
     }, []);
+    if (user) {
+        return <button className="navbar-btn" onClick={logoutUser}>Logout</button>
+    } else
+        return <button className="navbar-btn" onClick={loginUser}>Login</button>
 
-    return (
-        <>
-            <button className="navbar-btn" onClick={loginUser}>Login</button>
-            <button className="navbar-btn" onClick={logoutUser}>Logout</button>
-
-        </>
-    )
 }

@@ -1,5 +1,7 @@
-export default function Chart(){
+export default function Chart() {
     return (
-        <h2>Hier ist ein Chart</h2>
+        <div className="chart">
+            <h2>Hier ist ein Chart</h2>
+        </div>
     )
 }
