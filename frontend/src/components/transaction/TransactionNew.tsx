@@ -1,12 +1,14 @@
 import {useNavigate} from "react-router-dom";
-import { type SyntheticEvent, useState} from "react";
+import {type SyntheticEvent, useState} from "react";
 import axios from "axios";
 import type {TransactionIn} from "../../models/TransactionIn.ts";
+import TransactionForm from "./TransactionForm.tsx";
+
 type TransactionNewProps = {
     loadUser: () => void;
 }
 
-export default function TransactionNew({loadUser}: TransactionNewProps) {
+export default function TransactionNew({loadUser}: Readonly<TransactionNewProps>) {
     const nav = useNavigate();
     const [assetName, setAssetName] = useState<string>("");
     const [ticker, setTicker] = useState<string>("");
@@ -15,8 +17,7 @@ export default function TransactionNew({loadUser}: TransactionNewProps) {
     const [fee, setFee] = useState<number>(0);
     const [timestamp, setTimestamp] = useState<string>("");
 
-
-    function saveTransaction(e:SyntheticEvent<HTMLFormElement>) {
+    function saveTransaction(e: SyntheticEvent<HTMLFormElement>) {
         e.preventDefault();
         const saveTransaction: TransactionIn = {ticker, assetName, cost, shares, timestamp, fee};
         axios.post(`/api/transactions`, saveTransaction)
@@ -32,49 +33,9 @@ export default function TransactionNew({loadUser}: TransactionNewProps) {
         <>
             <form onSubmit={saveTransaction}>
                 <h3>New Transaction</h3>
-                <label>Asset Name:
-                    <input
-                        type="string"
-                        value={assetName}
-                        onChange={(e) => setAssetName(e.target.value)}/>
-                </label>
-                <label>Ticker:
-                    <input
-                        type="string"
-                        value={ticker}
-                        onChange={(e) => setTicker(e.target.value)}/>
-                </label>
-                <label>Cost:
-                    <input
-                        type="number"
-                        value={cost}
-                        onChange={(e) => setCost(Number(e.target.value))}/>
-                    €
-                </label>
-                <label>Shares:
-                    <input
-                        type="number"
-                        value={shares}
-                        onChange={(e) => setShares(Number(e.target.value))}/>
-                </label>
-                <label>Fee:
-                    <input
-                        type="number"
-                        value={fee}
-                        onChange={(e) => setFee(Number(e.target.value))}/>
-                    €
-                </label>
-                <label>Timestamp:
-                    <input
-                        //Change to datetime
-                        type="string"
-                        value={timestamp}
-                        onChange={(e) => setTimestamp(e.target.value)}/>
-                </label>
-
-
-                <button type={"submit"}>Save Transaction</button>
-                <button type={"reset"} onClick={() => nav("/dashboard")}>Go Back</button>
+                <TransactionForm assetName={assetName} setAssetName={setAssetName} ticker={ticker} setTicker={setTicker}
+                                 cost={cost} setCost={setCost} shares={shares} setShares={setShares} fee={fee}
+                                 setFee={setFee} timestamp={timestamp} setTimestamp={setTimestamp}/>
             </form>
         </>
     )
