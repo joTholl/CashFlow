@@ -30,7 +30,7 @@ export default function TransactionForm(props: Readonly<TransactionFormProps>) {
                 <input type="number"
                        value={props.cost}
                        onChange={(e) => props.setCost(Number(e.target.value))}/>
-                €
+                {' '}€
             </label>
             <label>Shares:{' '}
                 <input type="number"
@@ -41,7 +41,7 @@ export default function TransactionForm(props: Readonly<TransactionFormProps>) {
                 <input type="number"
                        value={props.fee}
                        onChange={(e) => props.setFee(Number(e.target.value))}/>
-                €
+                {' '}€
             </label>
             <label>Timestamp:{' '}
                 <input //Change to datetime
