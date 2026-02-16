@@ -16,34 +16,34 @@ export default function TransactionForm(props: Readonly<TransactionFormProps>) {
 
     return (
         <>
-            <label>Asset Name:
+            <label>Asset Name:{' '}
                 <input type="string"
                        value={props.assetName}
                        onChange={(e) => props.setAssetName(e.target.value)}/>
             </label>
-            <label>Ticker:
+            <label>Ticker:{' '}
                 <input type="string"
                        value={props.ticker}
                        onChange={(e) => props.setTicker(e.target.value)}/>
             </label>
-            <label>Cost:
+            <label>Cost:{' '}
                 <input type="number"
                        value={props.cost}
                        onChange={(e) => props.setCost(Number(e.target.value))}/>
                 €
             </label>
-            <label>Shares:
+            <label>Shares:{' '}
                 <input type="number"
                        value={props.shares}
                        onChange={(e) => props.setShares(Number(e.target.value))}/>
             </label>
-            <label>Fee:
+            <label>Fee:{' '}
                 <input type="number"
                        value={props.fee}
                        onChange={(e) => props.setFee(Number(e.target.value))}/>
                 €
             </label>
-            <label>Timestamp:
+            <label>Timestamp:{' '}
                 <input //Change to datetime
                     type="string"
                     value={props.timestamp}
