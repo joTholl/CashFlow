@@ -9,7 +9,7 @@ type TransactionUpdateProps = {
 }
 
 
-export default function TransactionUpdate({loadUser}: TransactionUpdateProps) {
+export default function TransactionUpdate({loadUser}: Readonly<TransactionUpdateProps>) {
     const {id} = useParams<{ id: string }>();
     const nav = useNavigate();
     const [transaction, setTransaction] = useState<Transaction>();
@@ -55,7 +55,7 @@ export default function TransactionUpdate({loadUser}: TransactionUpdateProps) {
 
 
     return (
-        <>
+
             <form onSubmit={updateTransaction}>
                 <h3>Update Transaction</h3>
                 <h4>Transaction Id: {transaction?.id}</h4>
@@ -63,6 +63,6 @@ export default function TransactionUpdate({loadUser}: TransactionUpdateProps) {
                                  cost={cost} setCost={setCost} shares={shares} setShares={setShares} fee={fee}
                                  setFee={setFee} timestamp={timestamp} setTimestamp={setTimestamp}/>
             </form>
-        </>
+
     )
 }

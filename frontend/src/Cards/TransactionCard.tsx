@@ -7,7 +7,7 @@ type TransactionCardProps = {
 
 export default function TransactionCard({transaction}: Readonly<TransactionCardProps>) {
     return (
-        <>
+
             <div className="card">
                 <Link to={`/transaction/${transaction.id}`} className="link">
                     <h4>{transaction.assetName}</h4>
@@ -17,6 +17,6 @@ export default function TransactionCard({transaction}: Readonly<TransactionCardP
                     <p>{transaction.timestamp}</p>
                 </Link>
             </div>
-        </>
+
     )
 }

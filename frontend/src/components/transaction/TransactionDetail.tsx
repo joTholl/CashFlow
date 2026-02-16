@@ -6,7 +6,7 @@ import type {Transaction} from "../../models/Transaction.ts";
 type TransactionDetailProps = {
     loadUser: () => void;
 }
-export default function TransactionDetail({loadUser}: TransactionDetailProps) {
+export default function TransactionDetail({loadUser}: Readonly<TransactionDetailProps>) {
     const {id} = useParams<{ id: string }>();
     const nav = useNavigate();
     const [transaction, setTransaction] = useState<Transaction>();

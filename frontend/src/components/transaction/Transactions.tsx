@@ -22,8 +22,6 @@ export default function Transactions() {
         getTransactions();
     }, []);
     return (
-        <>
-
             <div className="component">
                 <h2>Transactions:</h2>
                 <button onClick={()=>nav("/newTransaction")}>New Transaction</button>
@@ -31,6 +29,5 @@ export default function Transactions() {
                     {sortedTransactions.map(transaction => <TransactionCard key={transaction.id} transaction={transaction}/>)}
                 </div>
             </div>
-        </>
     )
 }

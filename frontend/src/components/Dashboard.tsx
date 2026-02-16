@@ -15,7 +15,7 @@ export default function Dashboard({user}: Readonly<DashboardProps>) {
 
     })
     return (
-        <>
+
             <div className="dashboard">
                 <h1>Dashboard von {user.username}</h1>
                 <Chart/>
@@ -24,6 +24,6 @@ export default function Dashboard({user}: Readonly<DashboardProps>) {
                     <Transactions/>
                 </div>
             </div>
-        </>
+
     )
 }
