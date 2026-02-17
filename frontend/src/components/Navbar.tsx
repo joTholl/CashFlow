@@ -14,9 +14,8 @@ export default function Navbar({user}: Readonly<NavbarProps>) {
         )
     } else {
         return (
-            <>
-                <button onClick={() => nav("/")}>Home</button>
-            </>
+            <button onClick={() => nav("/")}>Home</button>
+
         )
     }
 
