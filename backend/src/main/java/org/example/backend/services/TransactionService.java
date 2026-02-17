@@ -2,10 +2,12 @@ package org.example.backend.services;
 
 import lombok.RequiredArgsConstructor;
 import org.example.backend.dtos.TransactionInDto;
+import org.example.backend.dtos.TransactionOutDto;
 import org.example.backend.models.Transaction;
 import org.example.backend.repositories.TransactionRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -19,21 +21,26 @@ public class TransactionService {
     private static final String TRANSACTION_NOT_FOUND = "Transaction not found";
 
 
-    public List<Transaction> getAllTransactions() {
-        return transactionRepository.findAll();
+    public List<TransactionOutDto> getAllTransactions() {
+        List<Transaction>  transactions = transactionRepository.findAll();
+        List<TransactionOutDto> tods = new ArrayList<>();
+        for(Transaction transaction : transactions) {
+            tods.add(new TransactionOutDto(transaction));
+        }
+        return tods;
     }
 
-    public Transaction getTransactionById(String id) {
-        return transactionRepository.findById(id).orElseThrow(() -> new NoSuchElementException(TRANSACTION_NOT_FOUND));
+    public TransactionOutDto getTransactionById(String id) {
+        return new TransactionOutDto(transactionRepository.findById(id).orElseThrow(() -> new NoSuchElementException(TRANSACTION_NOT_FOUND)));
     }
 
-    public Transaction addTransaction(TransactionInDto tid, String userId) {
+    public TransactionOutDto addTransaction(TransactionInDto tid, String userId) {
         Transaction transaction = transactionRepository.save(new Transaction(helperService.getRandomId(), tid));
         appUserService.addTransaction(transaction, userId);
-        return transaction;
+        return new TransactionOutDto(transaction);
     }
 
-    public Transaction updateTransaction(String transactionId, TransactionInDto tid, String userId) {
+    public TransactionOutDto updateTransaction(String transactionId, TransactionInDto tid, String userId) {
         Transaction transaction = transactionRepository.findById(transactionId).orElseThrow(() -> new NoSuchElementException(TRANSACTION_NOT_FOUND));
         Transaction updateTransaction = new Transaction(transactionId, tid);
         if (transaction.ticker().equals(tid.ticker()) && !transaction.assetName().equals(tid.assetName()) ||
@@ -43,7 +50,7 @@ public class TransactionService {
             appUserService.subtractTransaction(transaction, userId);
             appUserService.addTransaction(updateTransaction, userId);
         }
-        return transactionRepository.save(updateTransaction);
+        return new TransactionOutDto(transactionRepository.save(updateTransaction));
     }
 
     public void deleteTransaction(String transactionId, String userId) {

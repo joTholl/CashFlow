@@ -44,7 +44,7 @@ class TransactionControllerTest {
                 "assetName": "Bitcoin",
                 "cost": 100,
                 "shares": 0.001,
-                "timestamp": "2026-02-12T10:00:00Z",
+                "timestamp": "2026-02-12T11:00:00",
                 "fee": 0.1
             }
             """;
@@ -70,7 +70,7 @@ class TransactionControllerTest {
                             "assetName": "Bitcoin",
                             "cost": 100,
                             "shares": 0.001,
-                            "timestamp": "2026-02-12T10:00:00Z",
+                            "timestamp": "2026-02-12T11:00:00",
                             "fee": 0.1
                           },
                           {
@@ -79,7 +79,7 @@ class TransactionControllerTest {
                             "assetName": "Ethereum",
                             "cost": 1000,
                             "shares": 0.33,
-                            "timestamp": "2026-02-12T11:00:00Z",
+                            "timestamp": "2026-02-12T12:00:00",
                             "fee": 0.2
                           }
                         ]
@@ -112,7 +112,7 @@ class TransactionControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.assetName").value("Bitcoin"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.cost").value(100))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.fee").value(0.1))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.timestamp").value("2026-02-12T10:00:00Z"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.timestamp").value("2026-02-12T11:00:00"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.shares").value(0.001));
     }
 
@@ -132,7 +132,7 @@ class TransactionControllerTest {
                       "assetName": "Litecoin",
                       "cost": 100,
                       "shares": 0.001,
-                      "timestamp": "2026-02-12T10:00:00Z",
+                      "timestamp": "2026-02-12T11:00:00",
                       "fee": 0.1
                 }
                 """;

@@ -45,9 +45,9 @@ export default function TransactionForm(props: Readonly<TransactionFormProps>) {
             </label>
             <label>Timestamp:{' '}
                 <input //Change to datetime
-                    type="string"
-                    value={props.timestamp}
-                    onChange={(e) => props.setTimestamp(e.target.value)}/>
+                    type="datetime-local"
+                    value={props.timestamp? new Date(props.timestamp).toISOString().slice(0,16): ""}
+                    onChange={(e) => props.setTimestamp(new Date(e.target.value).toISOString())}/>
             </label>
             <button type={"submit"}>Save</button>
             <button type={"reset"} onClick={() => nav("/dashboard")}>Go Back</button>

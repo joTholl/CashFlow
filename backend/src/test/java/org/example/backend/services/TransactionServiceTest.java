@@ -1,12 +1,14 @@
 package org.example.backend.services;
 
 import org.example.backend.dtos.TransactionInDto;
+import org.example.backend.dtos.TransactionOutDto;
 import org.example.backend.models.Transaction;
 import org.example.backend.repositories.TransactionRepository;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -25,23 +27,26 @@ class TransactionServiceTest {
     private final Transaction transaction1 = new Transaction("zyx", "BTC", "Bitcoin", BigDecimal.valueOf(100), BigDecimal.valueOf(0.001), Instant.parse("2026-02-12T10:00:00.00Z"), BigDecimal.valueOf(0.1));
     private final Transaction transaction2 = new Transaction("abc", "ETH", "Ethereum", BigDecimal.valueOf(1000), BigDecimal.valueOf(0.33), Instant.parse("2026-02-12T11:00:00.00Z"), BigDecimal.valueOf(0.2));
 
-    private final TransactionInDto tid1 = new TransactionInDto("BTC", "Bitcoin", BigDecimal.valueOf(100), BigDecimal.valueOf(0.001), Instant.parse("2026-02-12T10:00:00.00Z"), BigDecimal.valueOf(0.1));
+    private final TransactionOutDto tod1 = new TransactionOutDto ("zyx", "BTC", "Bitcoin", BigDecimal.valueOf(100), BigDecimal.valueOf(0.001), LocalDateTime.parse("2026-02-12T11:00:00.00"), BigDecimal.valueOf(0.1));
+    private final TransactionOutDto tod2 = new TransactionOutDto ("abc", "ETH", "Ethereum", BigDecimal.valueOf(1000), BigDecimal.valueOf(0.33), LocalDateTime.parse("2026-02-12T12:00:00.00"), BigDecimal.valueOf(0.2));
+
+    private final TransactionInDto tid1 = new TransactionInDto("BTC", "Bitcoin", BigDecimal.valueOf(100), BigDecimal.valueOf(0.001), LocalDateTime.parse("2026-02-12T11:00:00.00"), BigDecimal.valueOf(0.1));
 
     @Test
     void getAllTransactions_shouldReturnAllTransactions() {
         when(transactionRepository.findAll()).thenReturn(List.of(transaction1, transaction2));
-        List<Transaction> transactions = transactionService.getAllTransactions();
+        List<TransactionOutDto> tods = transactionService.getAllTransactions();
         verify(transactionRepository).findAll();
-        assertEquals(List.of(transaction1, transaction2), transactions);
+        assertEquals(List.of(tod1, tod2), tods);
 
     }
 
     @Test
     void getTransactionById_shouldReturnTransaction() {
         when(transactionRepository.findById("zyx")).thenReturn(Optional.of(transaction1));
-        Transaction transaction = transactionService.getTransactionById("zyx");
+        TransactionOutDto tod = transactionService.getTransactionById("zyx");
         verify(transactionRepository).findById("zyx");
-        assertEquals(transaction1, transaction);
+        assertEquals(tod1, tod);
     }
 
     @Test
@@ -55,11 +60,11 @@ class TransactionServiceTest {
     void addTransaction_shouldAddTransaction() {
         when(helperService.getRandomId()).thenReturn("zyx");
         when(transactionRepository.save(transaction1)).thenReturn(transaction1);
-        Transaction transaction = transactionService.addTransaction(tid1, "abc");
+        TransactionOutDto tod = transactionService.addTransaction(tid1, "abc");
         verify(helperService).getRandomId();
         verify(transactionRepository).save(transaction1);
         verify(appUserService).addTransaction(transaction1, "abc");
-        assertEquals(transaction1, transaction);
+        assertEquals(tod1, tod);
     }
 
     @Test
@@ -67,12 +72,12 @@ class TransactionServiceTest {
         when(transactionRepository.findById("abc")).thenReturn(Optional.of(transaction2));
         Transaction transaction3 = transaction1.withId("abc");
         when(transactionRepository.save(transaction3)).thenReturn(transaction3);
-        Transaction transaction = transactionService.updateTransaction("abc", tid1, "abc");
+        TransactionOutDto tod = transactionService.updateTransaction("abc", tid1, "abc");
         verify(transactionRepository).findById("abc");
         verify(appUserService).subtractTransaction(transaction2, "abc");
         verify(appUserService).addTransaction(transaction3, "abc");
         verify(transactionRepository).save(transaction3);
-        assertEquals(transaction3, transaction);
+        assertEquals(tod1.withId("abc"), tod);
     }
 
     @Test

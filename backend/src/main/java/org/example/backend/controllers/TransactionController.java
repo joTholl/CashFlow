@@ -2,7 +2,7 @@ package org.example.backend.controllers;
 
 import lombok.RequiredArgsConstructor;
 import org.example.backend.dtos.TransactionInDto;
-import org.example.backend.models.Transaction;
+import org.example.backend.dtos.TransactionOutDto;
 import org.example.backend.services.TransactionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -19,23 +19,23 @@ public class TransactionController {
     private final TransactionService transactionService;
 
     @GetMapping
-    public List<Transaction> getAllTransactions() {
+    public List<TransactionOutDto> getAllTransactions() {
         return transactionService.getAllTransactions();
     }
 
     @GetMapping("/{id}")
-    public Transaction getTransactionById(@PathVariable String id) {
+    public TransactionOutDto getTransactionById(@PathVariable String id) {
         return transactionService.getTransactionById(id);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Transaction addTransaction(@RequestBody TransactionInDto tid, @AuthenticationPrincipal OAuth2User user) {
+    public TransactionOutDto addTransaction(@RequestBody TransactionInDto tid, @AuthenticationPrincipal OAuth2User user) {
         return transactionService.addTransaction(tid, user.getAttribute("id").toString());
     }
 
     @PutMapping("/{id}")
-    public Transaction updateTransaction(@PathVariable String id, @RequestBody TransactionInDto tid, @AuthenticationPrincipal OAuth2User user) {
+    public TransactionOutDto updateTransaction(@PathVariable String id, @RequestBody TransactionInDto tid, @AuthenticationPrincipal OAuth2User user) {
         return transactionService.updateTransaction(id, tid, user.getAttribute("id").toString());
     }
 
