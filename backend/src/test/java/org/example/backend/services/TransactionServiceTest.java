@@ -4,6 +4,7 @@ import org.example.backend.dtos.TransactionInDto;
 import org.example.backend.dtos.TransactionOutDto;
 import org.example.backend.models.Transaction;
 import org.example.backend.repositories.TransactionRepository;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.TimeZone;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -31,6 +33,11 @@ class TransactionServiceTest {
     private final TransactionOutDto tod2 = new TransactionOutDto ("abc", "ETH", "Ethereum", BigDecimal.valueOf(1000), BigDecimal.valueOf(0.33), LocalDateTime.parse("2026-02-12T12:00:00.00"), BigDecimal.valueOf(0.2));
 
     private final TransactionInDto tid1 = new TransactionInDto("BTC", "Bitcoin", BigDecimal.valueOf(100), BigDecimal.valueOf(0.001), LocalDateTime.parse("2026-02-12T11:00:00.00"), BigDecimal.valueOf(0.1));
+
+    @BeforeAll
+    static void setUp() {
+        TimeZone.setDefault(TimeZone.getTimeZone("CET"));
+    }
 
     @Test
     void getAllTransactions_shouldReturnAllTransactions() {

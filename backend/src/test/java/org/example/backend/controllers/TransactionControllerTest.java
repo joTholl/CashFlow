@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
+import java.util.TimeZone;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oidcLogin;
@@ -55,6 +56,7 @@ class TransactionControllerTest {
         appUserRepository.deleteAll();
         transactionRepository.save(transaction1);
         appUserRepository.save(appUser1);
+        TimeZone.setDefault(TimeZone.getTimeZone("CET"));
     }
 
     @Test
