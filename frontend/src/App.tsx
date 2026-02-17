@@ -29,7 +29,7 @@ function App() {
     return (
         <>
             <div className="navbar">
-                <Navbar/>
+                <Navbar user={user}/>
                 <Login user={user} loadUser={loadUser}/>
             </div>
             <Routes>

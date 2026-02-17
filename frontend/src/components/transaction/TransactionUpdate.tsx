@@ -56,7 +56,7 @@ export default function TransactionUpdate({loadUser}: Readonly<TransactionUpdate
 
     return (
 
-            <form onSubmit={updateTransaction}>
+            <form onSubmit={updateTransaction} className="form">
                 <h3>Update Transaction</h3>
                 <h4>Transaction Id: {transaction?.id}</h4>
                 <TransactionForm assetName={assetName} setAssetName={setAssetName} ticker={ticker} setTicker={setTicker}

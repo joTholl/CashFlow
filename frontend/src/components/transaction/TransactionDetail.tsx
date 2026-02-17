@@ -33,7 +33,7 @@ export default function TransactionDetail({loadUser}: Readonly<TransactionDetail
     }, [id]);
 
     return (
-        <>
+        <div className="form">
             <h3>Transaction Details</h3>
             <h4>Transaction Id: {transaction?.id}</h4>
             <p>Asset Name: {transaction?.assetName}</p>
@@ -41,9 +41,11 @@ export default function TransactionDetail({loadUser}: Readonly<TransactionDetail
             <p>Cost: {transaction?.cost} €</p>
             <p>Shares: {transaction?.shares}</p>
             <p>Fee: {transaction?.fee} €</p>
-            <p>Time: {transaction?.timestamp}</p>
-            <button onClick={() => nav(`/transaction/update/${id}`)}>Edit Transaction</button>
-            <button onClick={() => deleteTransaction()}>Delete Transaction</button>
-        </>
+            <p>Time: {transaction?.timestamp ? new Date(transaction?.timestamp).toISOString().slice(0, 16) : ""}</p>
+            <div className="buttons">
+                <button onClick={() => nav(`/transaction/update/${id}`)}>Edit Transaction</button>
+                <button onClick={() => deleteTransaction()}>Delete Transaction</button>
+            </div>
+        </div>
     )
 }

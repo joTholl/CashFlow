@@ -31,7 +31,7 @@ export default function TransactionNew({loadUser}: Readonly<TransactionNewProps>
 
     return (
 
-            <form onSubmit={saveTransaction}>
+            <form onSubmit={saveTransaction} className="form">
                 <h3>New Transaction</h3>
                 <TransactionForm assetName={assetName} setAssetName={setAssetName} ticker={ticker} setTicker={setTicker}
                                  cost={cost} setCost={setCost} shares={shares} setShares={setShares} fee={fee}

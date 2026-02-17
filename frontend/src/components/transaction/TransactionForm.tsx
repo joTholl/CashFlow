@@ -1,5 +1,6 @@
 import {useNavigate} from "react-router-dom";
 import * as React from "react";
+import "../../styles/TransactionForm.css";
 
 type TransactionFormProps = {
     assetName: string, setAssetName: React.Dispatch<React.SetStateAction<string>>,
@@ -44,14 +45,15 @@ export default function TransactionForm(props: Readonly<TransactionFormProps>) {
                 {' '}€
             </label>
             <label>Timestamp:{' '}
-                <input //Change to datetime
+                <input
                     type="datetime-local"
-                    value={props.timestamp? new Date(props.timestamp).toISOString().slice(0,16): ""}
+                    value={props.timestamp ? new Date(props.timestamp).toISOString().slice(0, 16) : ""}
                     onChange={(e) => props.setTimestamp(new Date(e.target.value).toISOString())}/>
             </label>
-            <button type={"submit"}>Save</button>
-            <button type={"reset"} onClick={() => nav("/dashboard")}>Go Back</button>
-
+            <div className="buttons">
+                <button type={"submit"}> Save</button>
+                <button type={"reset"} onClick={() => nav("/dashboard")}>Go Back</button>
+            </div>
         </>
     )
 }
