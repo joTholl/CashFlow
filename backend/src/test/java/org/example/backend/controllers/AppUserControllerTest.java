@@ -1,6 +1,5 @@
 package org.example.backend.controllers;
 
-import org.example.backend.dtos.AppUserOutDto;
 import org.example.backend.models.AppUser;
 import org.example.backend.repositories.AppUserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,8 +28,6 @@ class AppUserControllerTest {
     private final AppUser appUser1 = new AppUser("abc", "Rainer Zufall", new ArrayList<>());
     private final AppUser appUser2 = new AppUser("cba", "Max Mustermann", new ArrayList<>());
 
-    private final AppUserOutDto appUserOutDto1 = new AppUserOutDto(appUser1);
-    private final AppUserOutDto appUserOutDto2 = new AppUserOutDto(appUser2);
 
     private final String appUserOut1JSON = """
             {

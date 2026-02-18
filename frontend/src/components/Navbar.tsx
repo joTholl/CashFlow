@@ -1,14 +1,22 @@
 import {useNavigate} from "react-router-dom";
 
-
-export default function Navbar(){
+type NavbarProps = {
+    user: string | undefined | null;
+};
+export default function Navbar({user}: Readonly<NavbarProps>) {
     const nav = useNavigate();
-    return(
-        <>
-            <button onClick={()=>nav("/")}>Home</button>
-            <button onClick={()=>nav("/dashboard")}>Dashboard</button>
+    if (user) {
+        return (
+            <>
+                <button onClick={() => nav("/")}>Home</button>
+                <button onClick={() => nav("/dashboard")}>Dashboard</button>
+            </>
+        )
+    } else {
+        return (
+            <button onClick={() => nav("/")}>Home</button>
 
+        )
+    }
 
-        </>
-    )
 }
