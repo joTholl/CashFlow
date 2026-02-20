@@ -4,6 +4,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.example.backend.models.FinnhubResponse;
 import org.example.backend.models.FinnhubResponseData;
+import org.junit.jupiter.api.ClassOrderer;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
 
@@ -15,6 +16,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 
 @Component
 @RequiredArgsConstructor
@@ -25,18 +29,26 @@ public class FinnhubWebSocketClient implements WebSocket.Listener {
     private final ObjectMapper mapper = new ObjectMapper();
     private final List<String> symbolsToSubscribe = new CopyOnWriteArrayList<>();
 
+    private static final Logger LOGGER = Logger.getLogger( ClassOrderer.ClassName.class.getName() );
+
+
     @PostConstruct
     public void connect() {
-        HttpClient client = HttpClient.newHttpClient();
 
-        client.newWebSocketBuilder()
-                .buildAsync(
-                        URI.create("wss://ws.finnhub.io?token=" + System.getenv("FINNHUB_API_TOKEN")),
-                        this
-                )
-                .thenAccept(ws -> {
-                    this.webSocket = ws;
-                });
+        try {
+            HttpClient client = HttpClient.newHttpClient();
+
+            client.newWebSocketBuilder()
+                    .buildAsync(
+                            URI.create("wss://ws.finnhub.io?token=" + System.getenv("FINNHUB_API_TOKEN")),
+                            this
+                    )
+                    .thenAccept(ws ->
+                        this.webSocket = ws
+                    );
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Could not connect to Finnhub API endpoint", e);
+        }
     }
 
     @Override
@@ -49,7 +61,7 @@ public class FinnhubWebSocketClient implements WebSocket.Listener {
                 livePriceStore.updatePrice(finnhubResponseData.s(), finnhubResponseData.p());
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.WARNING, "Could not parse Finnhub response", e);
         }
         webSocket.request(1);
         return null;
@@ -85,14 +97,14 @@ public class FinnhubWebSocketClient implements WebSocket.Listener {
 
     @Override
     public CompletionStage<?> onClose(WebSocket webSocket, int statusCode, String reason) {
-        System.out.println("Connection closed: " + reason + " (" + statusCode + ")");
+        LOGGER.log(Level.FINE, "Connection closed: " + reason + " (" + statusCode + ")");
         reconnect();
         return null;
     }
 
     @Override
     public void onError(WebSocket webSocket, Throwable error) {
-        System.err.println("WebSocket error: " + error.getMessage());
+        LOGGER.log(Level.WARNING, "WebSocket error: " + error.getMessage());
         reconnect();
     }
 
