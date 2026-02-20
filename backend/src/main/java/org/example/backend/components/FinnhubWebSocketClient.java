@@ -85,7 +85,7 @@ public class FinnhubWebSocketClient implements WebSocket.Listener {
 
     @Override
     public void onOpen(WebSocket webSocket) {
-        System.out.println("Connected!");
+        LOGGER.info("Connected!");
         this.webSocket = webSocket;
 
         for (String symbol : symbolsToSubscribe) {
@@ -97,7 +97,7 @@ public class FinnhubWebSocketClient implements WebSocket.Listener {
 
     @Override
     public CompletionStage<?> onClose(WebSocket webSocket, int statusCode, String reason) {
-        LOGGER.info("Connection closed: " + reason + " (" + statusCode + ")");
+        LOGGER.info("Connection closed: {} ({})", reason, statusCode);
         reconnect();
         return null;
     }
