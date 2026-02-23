@@ -35,9 +35,7 @@ public class FinnhubWebSocketClient implements WebSocket.Listener {
 
     @PostConstruct
     public void connect() {
-
         try {
-
             httpClient.newWebSocketBuilder()
                     .buildAsync(
                             URI.create("wss://ws.finnhub.io?token=" + System.getenv("FINNHUB_API_TOKEN")),
@@ -57,8 +55,10 @@ public class FinnhubWebSocketClient implements WebSocket.Listener {
                                      boolean last) {
         try {
             FinnhubResponse finnhubResponse = mapper.readValue(data.toString(), FinnhubResponse.class);
-            for (FinnhubResponseData finnhubResponseData : finnhubResponse.data()) {
-                livePriceStore.updatePrice(finnhubResponseData.s(), finnhubResponseData.p());
+            if (finnhubResponse.data() != null) {
+                for (FinnhubResponseData finnhubResponseData : finnhubResponse.data()) {
+                    livePriceStore.updatePrice(finnhubResponseData.s(), finnhubResponseData.p());
+                }
             }
         } catch (Exception e) {
             LOGGER.warn("Could not parse Finnhub response", e);
@@ -68,16 +68,34 @@ public class FinnhubWebSocketClient implements WebSocket.Listener {
     }
 
     public void addSymbol(String symbol) {
-        symbolsToSubscribe.add(symbol);
+        if (!symbolsToSubscribe.contains(symbol)) {
+            symbolsToSubscribe.add(symbol);
 
-        if (webSocket != null) {
-            sendSubscribe(symbol);
+            if (webSocket != null) {
+                sendSubscribe(symbol);
+            }
         }
     }
 
     private void sendSubscribe(String symbol) {
         String message = String.format(
                 "{\"type\":\"subscribe\",\"symbol\":\"%s\"}",
+                symbol
+        );
+        webSocket.sendText(message, true);
+    }
+
+    public void removeSymbol(String symbol) {
+        symbolsToSubscribe.remove(symbol);
+
+        if (webSocket != null) {
+            sendUnsubscribe(symbol);
+        }
+    }
+
+    private void sendUnsubscribe(String symbol) {
+        String message = String.format(
+                "{\"type\":\"unsubscribe\",\"symbol\":\"%s\"}",
                 symbol
         );
         webSocket.sendText(message, true);

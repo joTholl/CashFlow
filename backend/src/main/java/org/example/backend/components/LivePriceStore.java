@@ -14,7 +14,7 @@ public class LivePriceStore {
         prices.put(symbol, price);
     }
 
-    public BigDecimal getPrice(String symbol) {
-        return prices.getOrDefault(symbol, BigDecimal.ZERO);
+    public Map<String, BigDecimal> getAllPrices() {
+        return prices;
     }
 }

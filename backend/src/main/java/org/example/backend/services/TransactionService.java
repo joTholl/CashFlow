@@ -18,6 +18,7 @@ public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final HelperService helperService;
     private final AppUserService appUserService;
+    private final FinnhubService finnhubService;
     private static final String TRANSACTION_NOT_FOUND = "Transaction not found";
 
 
@@ -37,6 +38,7 @@ public class TransactionService {
     public TransactionOutDto addTransaction(TransactionInDto tid, String userId) {
         Transaction transaction = transactionRepository.save(new Transaction(helperService.getRandomId(), tid));
         appUserService.addTransaction(transaction, userId);
+        finnhubService.addSymbol(tid.ticker(),tid.assetType());
         return new TransactionOutDto(transaction);
     }
 
@@ -48,7 +50,9 @@ public class TransactionService {
             throw new IllegalArgumentException("Ticker and Assetname have both to change or none of them!");
         } else {
             appUserService.subtractTransaction(transaction, userId);
+            finnhubService.removeSymbol(transaction.ticker());
             appUserService.addTransaction(updateTransaction, userId);
+            finnhubService.addSymbol(tid.ticker(),tid.assetType());
         }
         return new TransactionOutDto(transactionRepository.save(updateTransaction));
     }
@@ -56,6 +60,7 @@ public class TransactionService {
     public void deleteTransaction(String transactionId, String userId) {
         Transaction transaction = transactionRepository.findById(transactionId).orElseThrow(() -> new NoSuchElementException(TRANSACTION_NOT_FOUND));
         appUserService.subtractTransaction(transaction, userId);
+        finnhubService.removeSymbol(transaction.ticker());
         transactionRepository.deleteById(transactionId);
     }
 
