@@ -117,7 +117,7 @@ class TransactionControllerTest {
     @Test
     void addTransaction_shouldAddTransaction() throws Exception {
         transactionRepository.deleteAll();
-        mockServer.expect(requestTo("https://finnhub.io/api/v1/crypto/symbol?exchange=binance"))
+        mockServer.expect(requestTo("https://finnhub.io/api/v1/crypto/symbol?exchange=binance&X-Finnhub-Token="))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withSuccess("""
                         [
@@ -162,7 +162,7 @@ class TransactionControllerTest {
                       "assetType": "CRYPTO"
                 }
                 """;
-        mockServer.expect(requestTo("https://finnhub.io/api/v1/crypto/symbol?exchange=binance"))
+        mockServer.expect(requestTo("https://finnhub.io/api/v1/crypto/symbol?exchange=binance&X-Finnhub-Token="))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withSuccess("""
                         [
