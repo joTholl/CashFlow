@@ -1,5 +1,6 @@
 package org.example.backend.controllers;
 
+import org.example.backend.enums.AssetType;
 import org.example.backend.models.AppUser;
 import org.example.backend.models.Asset;
 import org.example.backend.models.Transaction;
@@ -8,8 +9,12 @@ import org.example.backend.repositories.TransactionRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.restclient.test.autoconfigure.AutoConfigureMockRestServiceServer;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -21,21 +26,27 @@ import java.util.TimeZone;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oidcLogin;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 @AutoConfigureMockMvc
 @SpringBootTest
+@AutoConfigureMockRestServiceServer
 class TransactionControllerTest {
     @Autowired
     private MockMvc mockMvc;
+    @Autowired
+    private MockRestServiceServer mockServer;
     @Autowired
     private TransactionRepository transactionRepository;
     @Autowired
     private AppUserRepository appUserRepository;
 
-    private final Transaction transaction1 = new Transaction("zyx", "BTC", "Bitcoin", BigDecimal.valueOf(100), BigDecimal.valueOf(0.001), Instant.parse("2026-02-12T10:00:00Z"), BigDecimal.valueOf(0.1));
-    private final Transaction transaction2 = new Transaction("abc", "ETH", "Ethereum", BigDecimal.valueOf(1000), BigDecimal.valueOf(0.33), Instant.parse("2026-02-12T11:00:00Z"), BigDecimal.valueOf(0.2));
+    private final Transaction transaction1 = new Transaction("zyx", "BTC", "Bitcoin", BigDecimal.valueOf(100), BigDecimal.valueOf(0.001), Instant.parse("2026-02-12T10:00:00Z"), BigDecimal.valueOf(0.1), AssetType.CRYPTO);
+    private final Transaction transaction2 = new Transaction("abc", "ETH", "Ethereum", BigDecimal.valueOf(1000), BigDecimal.valueOf(0.33), Instant.parse("2026-02-12T11:00:00Z"), BigDecimal.valueOf(0.2), AssetType.CRYPTO);
 
-    private final Asset asset1 = new Asset("BTC", BigDecimal.valueOf(0.001), "Bitcoin", BigDecimal.valueOf(100));
+    private final Asset asset1 = new Asset("BTC", BigDecimal.valueOf(0.001), "Bitcoin", BigDecimal.valueOf(100), AssetType.CRYPTO);
     private final AppUser appUser1 = new AppUser("abc", "Rainer Zufall", List.of(asset1));
 
     private final String transaction1JSON = """
@@ -46,7 +57,8 @@ class TransactionControllerTest {
                 "cost": 100,
                 "shares": 0.001,
                 "timestamp": "2026-02-12T11:00:00",
-                "fee": 0.1
+                "fee": 0.1,
+                "assetType": "CRYPTO"
             }
             """;
 
@@ -105,6 +117,17 @@ class TransactionControllerTest {
     @Test
     void addTransaction_shouldAddTransaction() throws Exception {
         transactionRepository.deleteAll();
+        mockServer.expect(requestTo("https://finnhub.io/api/v1/crypto/symbol?exchange=binance"))
+                .andExpect(method(HttpMethod.GET))
+                .andRespond(withSuccess("""
+                        [
+                        {
+                                "description": "Binance BTC/USDT",
+                                "displaySymbol": "BTC/USDT",
+                                "symbol": "BTC"
+                            }
+                            ]
+                        """, MediaType.APPLICATION_JSON));
         mockMvc.perform(MockMvcRequestBuilders.post("/api/transactions")
                         .with(oidcLogin().userInfoToken(token -> token.claim("id", "abc")))
                         .contentType(APPLICATION_JSON).content(transaction1JSON))
@@ -135,9 +158,21 @@ class TransactionControllerTest {
                       "cost": 100,
                       "shares": 0.001,
                       "timestamp": "2026-02-12T11:00:00",
-                      "fee": 0.1
+                      "fee": 0.1,
+                      "assetType": "CRYPTO"
                 }
                 """;
+        mockServer.expect(requestTo("https://finnhub.io/api/v1/crypto/symbol?exchange=binance"))
+                .andExpect(method(HttpMethod.GET))
+                .andRespond(withSuccess("""
+                        [
+                        {
+                                "description": "Binance LTC/USDT",
+                                "displaySymbol": "LTC/USDT",
+                                "symbol": "LTC"
+                            }
+                            ]
+                        """, MediaType.APPLICATION_JSON));
         mockMvc.perform(MockMvcRequestBuilders.put("/api/transactions/zyx")
                         .with(oidcLogin().userInfoToken(token -> token.claim("id", "abc")))
                         .contentType(APPLICATION_JSON).content(newTransactionJSON))

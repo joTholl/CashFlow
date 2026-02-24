@@ -40,7 +40,7 @@ public class AppUserService {
             }
         }
         if (!updated) {
-            assets.add(new Asset(transaction.ticker(), transaction.shares(), transaction.assetName(), costAndFee));
+            assets.add(new Asset(transaction.ticker(), transaction.shares(), transaction.assetName(), costAndFee, transaction.assetType()));
         }
         appUserRepository.save(appUser.withAssets(assets));
     }

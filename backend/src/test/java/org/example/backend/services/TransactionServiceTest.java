@@ -2,6 +2,7 @@ package org.example.backend.services;
 
 import org.example.backend.dtos.TransactionInDto;
 import org.example.backend.dtos.TransactionOutDto;
+import org.example.backend.enums.AssetType;
 import org.example.backend.models.Transaction;
 import org.example.backend.repositories.TransactionRepository;
 import org.junit.jupiter.api.BeforeAll;
@@ -24,15 +25,16 @@ class TransactionServiceTest {
     private final TransactionRepository transactionRepository = mock(TransactionRepository.class);
     private final HelperService helperService = mock(HelperService.class);
     private final AppUserService appUserService = mock(AppUserService.class);
-    private final TransactionService transactionService = new TransactionService(transactionRepository, helperService, appUserService);
+    private final FinnhubService finnhubService = mock(FinnhubService.class);
+    private final TransactionService transactionService = new TransactionService(transactionRepository, helperService, appUserService, finnhubService);
 
-    private final Transaction transaction1 = new Transaction("zyx", "BTC", "Bitcoin", BigDecimal.valueOf(100), BigDecimal.valueOf(0.001), Instant.parse("2026-02-12T10:00:00.00Z"), BigDecimal.valueOf(0.1));
-    private final Transaction transaction2 = new Transaction("abc", "ETH", "Ethereum", BigDecimal.valueOf(1000), BigDecimal.valueOf(0.33), Instant.parse("2026-02-12T11:00:00.00Z"), BigDecimal.valueOf(0.2));
+    private final Transaction transaction1 = new Transaction("zyx", "BTC", "Bitcoin", BigDecimal.valueOf(100), BigDecimal.valueOf(0.001), Instant.parse("2026-02-12T10:00:00.00Z"), BigDecimal.valueOf(0.1), AssetType.CRYPTO);
+    private final Transaction transaction2 = new Transaction("abc", "ETH", "Ethereum", BigDecimal.valueOf(1000), BigDecimal.valueOf(0.33), Instant.parse("2026-02-12T11:00:00.00Z"), BigDecimal.valueOf(0.2), AssetType.CRYPTO);
 
-    private final TransactionOutDto tod1 = new TransactionOutDto ("zyx", "BTC", "Bitcoin", BigDecimal.valueOf(100), BigDecimal.valueOf(0.001), LocalDateTime.parse("2026-02-12T11:00:00.00"), BigDecimal.valueOf(0.1));
-    private final TransactionOutDto tod2 = new TransactionOutDto ("abc", "ETH", "Ethereum", BigDecimal.valueOf(1000), BigDecimal.valueOf(0.33), LocalDateTime.parse("2026-02-12T12:00:00.00"), BigDecimal.valueOf(0.2));
+    private final TransactionOutDto tod1 = new TransactionOutDto ("zyx", "BTC", "Bitcoin", BigDecimal.valueOf(100), BigDecimal.valueOf(0.001), LocalDateTime.parse("2026-02-12T11:00:00.00"), BigDecimal.valueOf(0.1), AssetType.CRYPTO);
+    private final TransactionOutDto tod2 = new TransactionOutDto ("abc", "ETH", "Ethereum", BigDecimal.valueOf(1000), BigDecimal.valueOf(0.33), LocalDateTime.parse("2026-02-12T12:00:00.00"), BigDecimal.valueOf(0.2), AssetType.CRYPTO);
 
-    private final TransactionInDto tid1 = new TransactionInDto("BTC", "Bitcoin", BigDecimal.valueOf(100), BigDecimal.valueOf(0.001), LocalDateTime.parse("2026-02-12T11:00:00.00"), BigDecimal.valueOf(0.1));
+    private final TransactionInDto tid1 = new TransactionInDto("BTC", "Bitcoin", BigDecimal.valueOf(100), BigDecimal.valueOf(0.001), LocalDateTime.parse("2026-02-12T11:00:00.00"), BigDecimal.valueOf(0.1), AssetType.CRYPTO);
 
     @BeforeAll
     static void setUp() {

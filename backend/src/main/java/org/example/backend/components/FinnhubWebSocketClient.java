@@ -129,6 +129,4 @@ public class FinnhubWebSocketClient implements WebSocket.Listener {
     private void reconnect() {
         CompletableFuture.delayedExecutor(5, TimeUnit.SECONDS).execute(this::connect);
     }
-
-
 }

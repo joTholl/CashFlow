@@ -7,13 +7,11 @@ import org.example.backend.enums.AssetType;
 import org.example.backend.exceptions.SymbolNotFoundException;
 import org.example.backend.models.Asset;
 import org.example.backend.models.FinnhubCryptoEntry;
-import org.example.backend.models.FinnhubCryptoList;
 import org.example.backend.models.FinnhubSearchResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Map;
 
 @Service
@@ -28,7 +26,7 @@ public class FinnhubService {
         this.finnhubWebSocketClient = finnhubWebSocketClient;
         this.livePriceStore = livePriceStore;
         this.appUserService = appUserService;
-        this.restClient = restClientBuilder.baseUrl("https://https://finnhub.io/api/v1").build();
+        this.restClient = restClientBuilder.baseUrl("https://finnhub.io/api/v1").build();
     }
 
     public Map<String, BigDecimal> getLivePrices() {
@@ -70,7 +68,8 @@ public class FinnhubService {
     }
 
     private boolean isCryptoSymbolExisting(String ticker) {
-        List<FinnhubCryptoEntry> finnhubCryptoList = restClient.get().uri("/crypto/symbol?exchange=binance").retrieve().body(FinnhubCryptoList.class).finnhubCryptoEntries();
+        FinnhubCryptoEntry[] finnhubCryptoList = restClient.get().uri("/crypto/symbol?exchange=binance").retrieve().toEntity(FinnhubCryptoEntry[].class).getBody();
+
         for (FinnhubCryptoEntry finnhubCryptoEntry : finnhubCryptoList) {
             if (finnhubCryptoEntry.symbol().equals(ticker)) {
                 return true;
