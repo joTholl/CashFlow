@@ -78,8 +78,7 @@ public class FinnhubWebSocketClient implements WebSocket.Listener {
     }
 
     private void sendSubscribe(String symbol) {
-        String message = String.format("""
-                {"type":"subscribe","symbol":"%s"}""", symbol);
+        String message = String.format("{'type':'subscribe','symbol':'%s'}", symbol);
         webSocket.sendText(message, true);
     }
 
@@ -94,8 +93,7 @@ public class FinnhubWebSocketClient implements WebSocket.Listener {
     }
 
     private void sendUnsubscribe(String symbol) {
-        String message = String.format("""
-                "{"type":"unsubscribe","symbol":"%s"}""", symbol);
+        String message = String.format("{'type':'unsubscribe','symbol':'%s'}", symbol);
         webSocket.sendText(message, true);
     }
 
