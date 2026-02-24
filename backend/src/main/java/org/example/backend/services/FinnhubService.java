@@ -59,7 +59,7 @@ public class FinnhubService {
     }
 
     private boolean isStockSymbolExisting(String ticker) {
-        FinnhubSearchResponse finnhubSearchResponse = restClient.get().uri("/search?q={symbol}&exchange=US", ticker).retrieve().body(FinnhubSearchResponse.class);
+        FinnhubSearchResponse finnhubSearchResponse = restClient.get().uri("/search?q={symbol}&exchange=US&X-Finnhub-Token={token}", ticker, System.getenv("FINNHUB_API_TOKEN")).retrieve().body(FinnhubSearchResponse.class);
         if (finnhubSearchResponse == null || finnhubSearchResponse.result() == null) {
             return false;
         } else {
@@ -68,7 +68,7 @@ public class FinnhubService {
     }
 
     private boolean isCryptoSymbolExisting(String ticker) {
-        FinnhubCryptoEntry[] finnhubCryptoList = restClient.get().uri("/crypto/symbol?exchange=binance").retrieve().toEntity(FinnhubCryptoEntry[].class).getBody();
+        FinnhubCryptoEntry[] finnhubCryptoList = restClient.get().uri("/crypto/symbol?exchange=binance&X-Finnhub-Token={token}", System.getenv("FINNHUB_API_TOKEN")).retrieve().toEntity(FinnhubCryptoEntry[].class).getBody();
 
         for (FinnhubCryptoEntry finnhubCryptoEntry : finnhubCryptoList) {
             if (finnhubCryptoEntry.symbol().equals(ticker)) {
