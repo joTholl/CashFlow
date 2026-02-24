@@ -18,7 +18,6 @@ class FinnhubWebSocketClientTest {
     private final FinnhubWebSocketClient finnhubWebSocketClient = new FinnhubWebSocketClient(livePriceStore);
 
 
-
     @BeforeEach
     void setUp() {
         symbolsToSubscribe.removeAll(symbolsToSubscribe);
@@ -78,8 +77,7 @@ class FinnhubWebSocketClientTest {
     void addSymbol_shouldAddAndSubscribe() {
         finnhubWebSocketClient.onOpen(webSocket);
         finnhubWebSocketClient.addSymbol("BINANCE:BTCUSDT");
-        verify(webSocket).sendText("""
-                {"type":"subscribe","symbol":"BINANCE:BTCUSDT"}""", true);
+        verify(webSocket).sendText("{'type':'subscribe','symbol':'BINANCE:BTCUSDT'}", true);
     }
 
     @Test
@@ -87,8 +85,7 @@ class FinnhubWebSocketClientTest {
         finnhubWebSocketClient.onOpen(webSocket);
         finnhubWebSocketClient.addSymbol("BINANCE:BTCUSDT");
         finnhubWebSocketClient.addSymbol("BINANCE:BTCUSDT");
-        verify(webSocket, times(1)).sendText("""
-                {"type":"subscribe","symbol":"BINANCE:BTCUSDT"}""", true);
+        verify(webSocket, times(1)).sendText("{'type':'subscribe','symbol':'BINANCE:BTCUSDT'}", true);
     }
 
     @Test
@@ -127,8 +124,8 @@ class FinnhubWebSocketClientTest {
         finnhubWebSocketClient.addSymbol("AAPL");
         finnhubWebSocketClient.addSymbol("MSFT");
         finnhubWebSocketClient.onOpen(mockWebSocket);
-        verify(mockWebSocket).sendText("{\"type\":\"subscribe\",\"symbol\":\"AAPL\"}", true);
-        verify(mockWebSocket).sendText("{\"type\":\"subscribe\",\"symbol\":\"MSFT\"}", true);
+        verify(mockWebSocket).sendText("{'type':'subscribe','symbol':'AAPL'}", true);
+        verify(mockWebSocket).sendText("{'type':'subscribe','symbol':'MSFT'}", true);
         verify(mockWebSocket).request(1);
     }
 
