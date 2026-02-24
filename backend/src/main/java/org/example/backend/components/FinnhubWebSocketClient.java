@@ -109,6 +109,7 @@ public class FinnhubWebSocketClient implements WebSocket.Listener {
         webSocket.request(1);
     }
 
+
     @Override
     public CompletionStage<?> onClose(WebSocket webSocket, int statusCode, String reason) {
         LOGGER.info("Connection closed: {} ({})", reason, statusCode);
