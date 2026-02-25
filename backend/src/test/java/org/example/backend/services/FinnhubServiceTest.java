@@ -1,17 +1,16 @@
 package org.example.backend.services;
 
+import org.example.backend.models.*;
 import org.example.backend.components.FinnhubWebSocketClient;
 import org.example.backend.components.LivePriceStore;
 import org.example.backend.dtos.AppUserOutDto;
 import org.example.backend.enums.AssetType;
 import org.example.backend.exceptions.SymbolNotFoundException;
-import org.example.backend.models.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
-
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
@@ -131,7 +130,7 @@ class FinnhubServiceTest {
                 ]
                 }
                 """, MediaType.APPLICATION_JSON));
-        finnhubService.addSymbol("MSFT",AssetType.STOCK);
+        finnhubService.addSymbol("MSFT", AssetType.STOCK);
         verify(finnhubWebSocketClient).addSymbol("MSFT");
     }
 
@@ -146,7 +145,7 @@ class FinnhubServiceTest {
                     }
                     ]
                 """, MediaType.APPLICATION_JSON));
-        finnhubService.addSymbol("BINANCE:BTCUSDT",AssetType.CRYPTO);
+        finnhubService.addSymbol("BINANCE:BTCUSDT", AssetType.CRYPTO);
         verify(finnhubWebSocketClient).addSymbol("BINANCE:BTCUSDT");
     }
 
@@ -156,7 +155,7 @@ class FinnhubServiceTest {
                 [
                 ]
                 """, MediaType.APPLICATION_JSON));
-        Exception e = assertThrows(SymbolNotFoundException.class, () -> finnhubService.addSymbol("BINANCE:BTCUSDT",AssetType.CRYPTO));
+        Exception e = assertThrows(SymbolNotFoundException.class, () -> finnhubService.addSymbol("BINANCE:BTCUSDT", AssetType.CRYPTO));
         verifyNoInteractions(finnhubWebSocketClient);
         assertEquals("Symbol not found: BINANCE:BTCUSDT", e.getMessage());
     }
@@ -170,7 +169,7 @@ class FinnhubServiceTest {
                 ]
                 }
                 """, MediaType.APPLICATION_JSON));
-        Exception e = assertThrows(SymbolNotFoundException.class, () -> finnhubService.addSymbol("MSFT",AssetType.STOCK));
+        Exception e = assertThrows(SymbolNotFoundException.class, () -> finnhubService.addSymbol("MSFT", AssetType.STOCK));
         verifyNoInteractions(finnhubWebSocketClient);
         assertEquals("Symbol not found: MSFT", e.getMessage());
     }
