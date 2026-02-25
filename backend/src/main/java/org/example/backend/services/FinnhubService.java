@@ -26,7 +26,9 @@ public class FinnhubService {
         this.finnhubWebSocketClient = finnhubWebSocketClient;
         this.livePriceStore = livePriceStore;
         this.appUserService = appUserService;
-        this.restClient = restClientBuilder.baseUrl("https://finnhub.io/api/v1").build();
+        this.restClient = restClientBuilder.baseUrl("https://finnhub.io/api/v1")
+                .build();
+
     }
 
     public Map<String, BigDecimal> getLivePrices() {
@@ -37,8 +39,10 @@ public class FinnhubService {
         AppUserOutDto user = appUserService.getAppUser(id);
         if (!user.assets().isEmpty()) {
             for (Asset asset : user.assets()) {
-                if (asset.ticker() == null || !isStockSymbolExisting(asset.ticker())) {
-                    throw new SymbolNotFoundException("Symbol not found: " + asset.ticker());
+                if (asset.assetType() == AssetType.STOCK && !isStockSymbolExisting(asset.ticker())) {
+                    throw new SymbolNotFoundException("Stock Symbol not found: " + asset.ticker());
+                } else if (asset.assetType() == AssetType.CRYPTO && !isCryptoSymbolExisting(asset.ticker())) {
+                    throw new SymbolNotFoundException("Crypto Symbol not found: " + asset.ticker());
                 }
                 finnhubWebSocketClient.addSymbol(asset.ticker());
             }
@@ -59,8 +63,9 @@ public class FinnhubService {
     }
 
     private boolean isStockSymbolExisting(String ticker) {
-        FinnhubSearchResponse finnhubSearchResponse = restClient.get().uri("/search?q={symbol}&exchange=US&X-Finnhub-Token={token}", ticker, System.getenv("FINNHUB_API_TOKEN")).retrieve().body(FinnhubSearchResponse.class);
-        if (finnhubSearchResponse == null || finnhubSearchResponse.result() == null) {
+        FinnhubSearchResponse finnhubSearchResponse = restClient.get().uri("/search?q={symbol}&exchange=US&X-Finnhub-Token={token}", ticker, System.getenv("FINNHUB_API_TOKEN"))
+                .retrieve().body(FinnhubSearchResponse.class);
+        if (finnhubSearchResponse == null || finnhubSearchResponse.result() == null || finnhubSearchResponse.result().isEmpty()) {
             return false;
         } else {
             return finnhubSearchResponse.result().getFirst().symbol().equals(ticker);
@@ -68,8 +73,8 @@ public class FinnhubService {
     }
 
     private boolean isCryptoSymbolExisting(String ticker) {
-        FinnhubCryptoEntry[] finnhubCryptoList = restClient.get().uri("/crypto/symbol?exchange=binance&X-Finnhub-Token={token}", System.getenv("FINNHUB_API_TOKEN")).retrieve().toEntity(FinnhubCryptoEntry[].class).getBody();
-
+        FinnhubCryptoEntry[] finnhubCryptoList = restClient.get().uri("/crypto/symbol?exchange=binance&X-Finnhub-Token={token}", System.getenv("FINNHUB_API_TOKEN"))
+                .retrieve().toEntity(FinnhubCryptoEntry[].class).getBody();
         for (FinnhubCryptoEntry finnhubCryptoEntry : finnhubCryptoList) {
             if (finnhubCryptoEntry.symbol().equals(ticker)) {
                 return true;

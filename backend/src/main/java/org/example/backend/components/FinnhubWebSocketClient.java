@@ -35,11 +35,14 @@ public class FinnhubWebSocketClient implements WebSocket.Listener {
 
     @PostConstruct
     public void connect() {
+        String uri = "";
+        if (System.getenv("FINNHUB_API_TOKEN") != null && !System.getenv("FINNHUB_API_TOKEN").isBlank()) {
+            uri = "wss://ws.finnhub.io?token=" + System.getenv("FINNHUB_API_TOKEN");
+        }
         try {
             httpClient.newWebSocketBuilder()
                     .buildAsync(
-                            URI.create("wss://ws.finnhub.io?token=" + System.getenv("FINNHUB_API_TOKEN")),
-                            this
+                            URI.create(uri), this
                     )
                     .thenAccept(ws ->
                             this.webSocket = ws

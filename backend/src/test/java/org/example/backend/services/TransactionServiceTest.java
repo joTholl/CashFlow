@@ -73,6 +73,7 @@ class TransactionServiceTest {
         verify(helperService).getRandomId();
         verify(transactionRepository).save(transaction1);
         verify(appUserService).addTransaction(transaction1, "abc");
+        verify(finnhubService).addSymbol("BTC",AssetType.CRYPTO);
         assertEquals(tod1, tod);
     }
 
@@ -86,6 +87,8 @@ class TransactionServiceTest {
         verify(appUserService).subtractTransaction(transaction2, "abc");
         verify(appUserService).addTransaction(transaction3, "abc");
         verify(transactionRepository).save(transaction3);
+        verify(finnhubService).removeSymbol("ETH");
+        verify(finnhubService).addSymbol("BTC",AssetType.CRYPTO);
         assertEquals(tod1.withId("abc"), tod);
     }
 
@@ -114,6 +117,7 @@ class TransactionServiceTest {
         verify(transactionRepository).findById("zyx");
         verify(appUserService).subtractTransaction(transaction1, "abc");
         verify(transactionRepository).deleteById("zyx");
+        verify(finnhubService).removeSymbol("BTC");
     }
 
     @Test
