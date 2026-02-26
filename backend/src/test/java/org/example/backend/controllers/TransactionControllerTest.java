@@ -78,6 +78,21 @@ class TransactionControllerTest {
             }
             """;
 
+    private final String cryptoListJSON = """
+                        [
+                        {
+                                "description": "Binance LTC/USDT",
+                                "displaySymbol": "LTC/USDT",
+                                "symbol": "BINANCE:LTCUSDT"
+                            },
+                            {
+                                "description": "Binance BTC/USDT",
+                                "displaySymbol": "BTC/USDT",
+                                "symbol": "BINANCE:BTCUSDT"
+                            }
+                            ]
+                        """;
+
     @BeforeEach
     void setUp() {
         transactionRepository.deleteAll();
@@ -86,6 +101,7 @@ class TransactionControllerTest {
         appUserRepository.save(appUser1);
         appUserRepository.save(appUser3);
         TimeZone.setDefault(TimeZone.getTimeZone("CET"));
+        mockServer.reset();
     }
 
     @Test
@@ -134,17 +150,9 @@ class TransactionControllerTest {
     @Test
     void addTransaction_shouldAddCryptoTransaction() throws Exception {
         transactionRepository.deleteAll();
-        mockServer.expect(requestTo("https://finnhub.io/api/v1/crypto/symbol?exchange=binance&X-Finnhub-Token="))
+        mockServer.expect(requestTo("https://finnhub.io/api/v1/crypto/symbol?exchange=binance&token=null"))
                 .andExpect(method(HttpMethod.GET))
-                .andRespond(withSuccess("""
-                        [
-                        {
-                                "description": "Binance BTC/USDT",
-                                "displaySymbol": "BTC/USDT",
-                                "symbol": "BINANCE:BTCUSDT"
-                            }
-                            ]
-                        """, MediaType.APPLICATION_JSON));
+                .andRespond(withSuccess(cryptoListJSON, MediaType.APPLICATION_JSON));
         mockMvc.perform(MockMvcRequestBuilders.post("/api/transactions")
                         .with(oidcLogin().userInfoToken(token -> token.claim("id", "abc")))
                         .contentType(APPLICATION_JSON).content(transaction1JSON))
@@ -161,7 +169,7 @@ class TransactionControllerTest {
     @Test
     void addTransaction_shouldAddStockTransaction() throws Exception {
         transactionRepository.deleteAll();
-        mockServer.expect(requestTo("https://finnhub.io/api/v1/search?q=AAPL&exchange=US&X-Finnhub-Token="))
+        mockServer.expect(requestTo("https://finnhub.io/api/v1/search?q=AAPL&exchange=US&token="))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withSuccess("""
                         {"count":1,
@@ -209,17 +217,9 @@ class TransactionControllerTest {
                       "assetType": "CRYPTO"
                 }
                 """;
-        mockServer.expect(requestTo("https://finnhub.io/api/v1/crypto/symbol?exchange=binance&X-Finnhub-Token="))
+        mockServer.expect(requestTo("https://finnhub.io/api/v1/crypto/symbol?exchange=binance&token=null"))
                 .andExpect(method(HttpMethod.GET))
-                .andRespond(withSuccess("""
-                        [
-                        {
-                                "description": "Binance LTC/USDT",
-                                "displaySymbol": "LTC/USDT",
-                                "symbol": "BINANCE:LTCUSDT"
-                            }
-                            ]
-                        """, MediaType.APPLICATION_JSON));
+                .andRespond(withSuccess(cryptoListJSON, MediaType.APPLICATION_JSON));
         mockMvc.perform(MockMvcRequestBuilders.put("/api/transactions/zyx")
                         .with(oidcLogin().userInfoToken(token -> token.claim("id", "abc")))
                         .contentType(APPLICATION_JSON).content(newTransactionJSON))
@@ -241,7 +241,7 @@ class TransactionControllerTest {
                       "assetType": "STOCK"
                 }
                 """;
-        mockServer.expect(requestTo("https://finnhub.io/api/v1/search?q=MSFT&exchange=US&X-Finnhub-Token="))
+        mockServer.expect(requestTo("https://finnhub.io/api/v1/search?q=MSFT&exchange=US&token="))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withSuccess("""
                         {"count":1,

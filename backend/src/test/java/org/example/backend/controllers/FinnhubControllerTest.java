@@ -57,7 +57,7 @@ class FinnhubControllerTest {
                 .andExpect(MockMvcResultMatchers.content().json("""
                                     {
                                     "AAPL": 200,
-                                    "BINANCE:BTCUSDT": 70000
+                                    "BTC": 70000
                                     }
                         """));
     }
@@ -65,7 +65,7 @@ class FinnhubControllerTest {
     @Test
     void addSymbolsFromAssets_shouldAddSymbols() throws Exception {
         appUserRepository.save(appUser1);
-        mockServer.expect(requestTo("https://finnhub.io/api/v1/crypto/symbol?exchange=binance&X-Finnhub-Token="))
+        mockServer.expect(requestTo("https://finnhub.io/api/v1/crypto/symbol?exchange=binance&token=null"))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withSuccess("""
                         [
@@ -76,7 +76,7 @@ class FinnhubControllerTest {
                             }
                             ]
                         """, MediaType.APPLICATION_JSON));
-        mockServer.expect(requestTo("https://finnhub.io/api/v1/search?q=AAPL&exchange=US&X-Finnhub-Token="))
+        mockServer.expect(requestTo("https://finnhub.io/api/v1/search?q=AAPL&exchange=US&token="))
                 .andExpect(method(HttpMethod.GET))
                 .andRespond(withSuccess("""
                         {"count":1,

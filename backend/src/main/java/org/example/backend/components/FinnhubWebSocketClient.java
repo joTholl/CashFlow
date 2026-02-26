@@ -78,7 +78,6 @@ public class FinnhubWebSocketClient implements WebSocket.Listener {
 
             if (webSocket != null) {
                 sendSubscribe(symbol);
-                System.out.println(symbolsToSubscribe);
             }
         }
     }

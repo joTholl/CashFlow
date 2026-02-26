@@ -51,7 +51,7 @@ class FinnhubServiceTest {
     @Test
     void addSymbolsFromAssets_shouldAddCryptoAssets() {
         when(appUserService.getAppUser("abc")).thenReturn(new AppUserOutDto(appUser1));
-        mockServer.expect(requestTo("https://finnhub.io/api/v1/crypto/symbol?exchange=binance&X-Finnhub-Token=")).andRespond(withSuccess("""
+        mockServer.expect(requestTo("https://finnhub.io/api/v1/crypto/symbol?exchange=binance&token=null")).andRespond(withSuccess("""
                     [
                     {
                         "description": "Binance BTC/USDT",
@@ -68,7 +68,7 @@ class FinnhubServiceTest {
     @Test
     void addSymbolsFromAssets_shouldAddStockAssets() {
         when(appUserService.getAppUser("abc")).thenReturn(new AppUserOutDto(appUser2));
-        mockServer.expect(requestTo("https://finnhub.io/api/v1/search?q=MSFT&exchange=US&X-Finnhub-Token=")).andRespond(withSuccess("""
+        mockServer.expect(requestTo("https://finnhub.io/api/v1/search?q=MSFT&exchange=US&token=")).andRespond(withSuccess("""
                 {"count":1,
                 "result":
                 [
@@ -89,7 +89,7 @@ class FinnhubServiceTest {
     @Test
     void addSymbolsFromAssets_shouldThrowException_whenCryptoSymbolNotFound() {
         when(appUserService.getAppUser("abc")).thenReturn(new AppUserOutDto(appUser1));
-        mockServer.expect(requestTo("https://finnhub.io/api/v1/crypto/symbol?exchange=binance&X-Finnhub-Token=")).andRespond(withSuccess("""
+        mockServer.expect(requestTo("https://finnhub.io/api/v1/crypto/symbol?exchange=binance&token=null")).andRespond(withSuccess("""
                 [
                 ]
                 """, MediaType.APPLICATION_JSON));
@@ -102,7 +102,7 @@ class FinnhubServiceTest {
     @Test
     void addSymbolsFromAssets_shouldThrowException_whenStockSymbolNotFound() {
         when(appUserService.getAppUser("abc")).thenReturn(new AppUserOutDto(appUser2));
-        mockServer.expect(requestTo("https://finnhub.io/api/v1/search?q=MSFT&exchange=US&X-Finnhub-Token=")).andRespond(withSuccess("""
+        mockServer.expect(requestTo("https://finnhub.io/api/v1/search?q=MSFT&exchange=US&token=")).andRespond(withSuccess("""
                 {"count":0,
                 "result":
                 [
@@ -117,7 +117,7 @@ class FinnhubServiceTest {
 
     @Test
     void addSymbol_shouldAddStockSymbol() {
-        mockServer.expect(requestTo("https://finnhub.io/api/v1/search?q=MSFT&exchange=US&X-Finnhub-Token=")).andRespond(withSuccess("""
+        mockServer.expect(requestTo("https://finnhub.io/api/v1/search?q=MSFT&exchange=US&token=")).andRespond(withSuccess("""
                 {"count":1,
                 "result":
                 [
@@ -136,7 +136,7 @@ class FinnhubServiceTest {
 
     @Test
     void addSymbol_shouldAddCryptoSymbol() {
-        mockServer.expect(requestTo("https://finnhub.io/api/v1/crypto/symbol?exchange=binance&X-Finnhub-Token=")).andRespond(withSuccess("""
+        mockServer.expect(requestTo("https://finnhub.io/api/v1/crypto/symbol?exchange=binance&token=null")).andRespond(withSuccess("""
                     [
                     {
                         "description": "Binance BTC/USDT",
@@ -151,7 +151,7 @@ class FinnhubServiceTest {
 
     @Test
     void addSymbol_shouldThrowException_whenCryptoSymbolNotFound() {
-        mockServer.expect(requestTo("https://finnhub.io/api/v1/crypto/symbol?exchange=binance&X-Finnhub-Token=")).andRespond(withSuccess("""
+        mockServer.expect(requestTo("https://finnhub.io/api/v1/crypto/symbol?exchange=binance&token=null")).andRespond(withSuccess("""
                 [
                 ]
                 """, MediaType.APPLICATION_JSON));
@@ -162,7 +162,7 @@ class FinnhubServiceTest {
 
     @Test
     void addSymbol_shouldThrowException_whenStockSymbolNotFound() {
-        mockServer.expect(requestTo("https://finnhub.io/api/v1/search?q=MSFT&exchange=US&X-Finnhub-Token=")).andRespond(withSuccess("""
+        mockServer.expect(requestTo("https://finnhub.io/api/v1/search?q=MSFT&exchange=US&token=")).andRespond(withSuccess("""
                 {"count":0,
                 "result":
                 [
