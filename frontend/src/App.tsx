@@ -13,6 +13,10 @@ import TransactionUpdate from "./components/transaction/TransactionUpdate.tsx";
 import axios from "axios";
 import TransactionNew from "./components/transaction/TransactionNew.tsx";
 
+function subscribeSymbols() {
+    axios.post("/api/live", {});
+}
+
 function App() {
     const [user, setUser] = useState<string | undefined | null>(undefined)
     const [appUser, setAppUser] = useState<AppUser>({
@@ -25,10 +29,6 @@ function App() {
             axios.get("/api/appuser").then(response => setAppUser(response.data))
         })
             .catch(() => setUser(null))
-    }
-
-    function subscribeSymbols(){
-        axios.post("/api/live", {});
     }
     useEffect(() => {
         subscribeSymbols();
