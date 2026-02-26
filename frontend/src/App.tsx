@@ -1,4 +1,4 @@
-import {useState} from 'react'
+import {useEffect, useState} from 'react'
 import './styles/App.css'
 import Login from "./components/Login.tsx";
 import {Route, Routes} from "react-router-dom";
@@ -26,6 +26,13 @@ function App() {
         })
             .catch(() => setUser(null))
     }
+
+    function subscribeSymbols(){
+        axios.post("/api/live", {});
+    }
+    useEffect(() => {
+        subscribeSymbols();
+    }, []);
     return (
         <>
             <div className="navbar">

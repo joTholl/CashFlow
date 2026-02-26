@@ -12,14 +12,8 @@ type DashboardProps = {
 
 export default function Dashboard({user}: Readonly<DashboardProps>) {
 
-    function subscribeSymbols(){
-        axios.post("/api/live", {});
-    }
-
     const [livePrices, setLivePrices] = useState<Record<string, number>>({});
-    useEffect(() => {
-        subscribeSymbols();
-    }, []);
+
     const fetchLoop = async () => {
         try {
             await axios.get("/api/live").then((response) => {setLivePrices(response.data);});
