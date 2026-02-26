@@ -1,9 +1,11 @@
 import {useNavigate, useParams} from "react-router-dom";
-import { type SyntheticEvent, useEffect, useState} from "react";
+import {type SyntheticEvent, useEffect, useState} from "react";
 import axios from "axios";
 import type {Transaction} from "../../models/Transaction.ts";
 import type {TransactionIn} from "../../models/TransactionIn.ts";
 import TransactionForm from "./TransactionForm.tsx";
+import type {AssetType} from "../../models/AssetType.ts";
+
 type TransactionUpdateProps = {
     loadUser: () => void;
 }
@@ -19,6 +21,7 @@ export default function TransactionUpdate({loadUser}: Readonly<TransactionUpdate
     const [shares, setShares] = useState<number>(0);
     const [fee, setFee] = useState<number>(0);
     const [timestamp, setTimestamp] = useState<string>("");
+    const [assetType, setAssetType] = useState<AssetType>("STOCK");
 
     function getTransaction() {
         axios.get(`/api/transactions/${id}`).then((response) => {
@@ -27,9 +30,9 @@ export default function TransactionUpdate({loadUser}: Readonly<TransactionUpdate
             .catch(error => console.log(error));
     }
 
-    function updateTransaction(e:SyntheticEvent<HTMLFormElement>) {
+    function updateTransaction(e: SyntheticEvent<HTMLFormElement>) {
         e.preventDefault();
-        const updateTransaction: TransactionIn = {ticker, assetName, cost, shares, timestamp, fee};
+        const updateTransaction: TransactionIn = {ticker, assetName, cost, shares, timestamp, fee, assetType};
         axios.put(`/api/transactions/${id}`, updateTransaction)
             .then(loadUser)
             .then(() => nav("/dashboard"))
@@ -50,19 +53,21 @@ export default function TransactionUpdate({loadUser}: Readonly<TransactionUpdate
             setShares(transaction.shares);
             setFee(transaction.fee);
             setTimestamp(transaction.timestamp);
+            setAssetType(transaction.assetType)
         }
     }, [transaction]);
 
 
     return (
 
-            <form onSubmit={updateTransaction} className="form">
-                <h3>Update Transaction</h3>
-                <h4>Transaction Id: {transaction?.id}</h4>
-                <TransactionForm assetName={assetName} setAssetName={setAssetName} ticker={ticker} setTicker={setTicker}
-                                 cost={cost} setCost={setCost} shares={shares} setShares={setShares} fee={fee}
-                                 setFee={setFee} timestamp={timestamp} setTimestamp={setTimestamp}/>
-            </form>
+        <form onSubmit={updateTransaction} className="form">
+            <h3>Update Transaction</h3>
+            <h4>Transaction Id: {transaction?.id}</h4>
+            <TransactionForm assetName={assetName} setAssetName={setAssetName} ticker={ticker} setTicker={setTicker}
+                             cost={cost} setCost={setCost} shares={shares} setShares={setShares} fee={fee}
+                             setFee={setFee} timestamp={timestamp} setTimestamp={setTimestamp} assetType={assetType}
+                             setAssetType={setAssetType}/>
+        </form>
 
     )
 }

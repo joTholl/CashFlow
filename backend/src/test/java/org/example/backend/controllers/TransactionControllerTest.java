@@ -141,7 +141,7 @@ class TransactionControllerTest {
                         {
                                 "description": "Binance BTC/USDT",
                                 "displaySymbol": "BTC/USDT",
-                                "symbol": "BTC"
+                                "symbol": "BINANCE:BTCUSDT"
                             }
                             ]
                         """, MediaType.APPLICATION_JSON));
@@ -216,7 +216,7 @@ class TransactionControllerTest {
                         {
                                 "description": "Binance LTC/USDT",
                                 "displaySymbol": "LTC/USDT",
-                                "symbol": "LTC"
+                                "symbol": "BINANCE:LTCUSDT"
                             }
                             ]
                         """, MediaType.APPLICATION_JSON));

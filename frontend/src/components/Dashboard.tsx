@@ -3,7 +3,8 @@ import Assets from "./Assets.tsx";
 import type {AppUser} from "../models/AppUser.ts";
 import Transactions from "./transaction/Transactions.tsx";
 import "../styles/Dashboard.css"
-import {useEffect} from "react";
+import {useEffect, useState} from "react";
+import axios from "axios";
 
 type DashboardProps = {
     user: AppUser
@@ -11,16 +12,34 @@ type DashboardProps = {
 
 export default function Dashboard({user}: Readonly<DashboardProps>) {
 
-    useEffect(() => {
+    function subscribeSymbols(){
+        axios.post("/api/live", {});
+    }
 
-    })
+    const [livePrices, setLivePrices] = useState<Record<string, number>>({});
+    useEffect(() => {
+        subscribeSymbols();
+    }, []);
+    const fetchLoop = async () => {
+        try {
+            await axios.get("/api/live").then((response) => {setLivePrices(response.data);});
+        } catch (error) {
+            console.error(error);
+        }
+
+        setTimeout(fetchLoop, 5000);
+    };
+    useEffect(() => {
+        fetchLoop();
+    }, []);
+
     return (
 
             <div className="dashboard">
                 <h1>Dashboard von {user.username}</h1>
                 <Chart/>
                 <div className="components">
-                    <Assets assets={user.assets}/>
+                    <Assets assets={user.assets} livePrices={livePrices}/>
                     <Transactions/>
                 </div>
             </div>

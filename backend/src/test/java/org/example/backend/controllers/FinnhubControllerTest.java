@@ -44,7 +44,7 @@ class FinnhubControllerTest {
 
 
 
-    private final Asset asset1 = new Asset("BINANCE:BTCUSDT", BigDecimal.valueOf(0.001), "Bitcoin", BigDecimal.valueOf(100), AssetType.CRYPTO);
+    private final Asset asset1 = new Asset("BTC", BigDecimal.valueOf(0.001), "Bitcoin", BigDecimal.valueOf(100), AssetType.CRYPTO);
     private final Asset asset2 = new Asset("AAPL", BigDecimal.valueOf(1.4), "Apple Inc.", BigDecimal.valueOf(100), AssetType.STOCK);
     private final AppUser appUser1 = new AppUser("abc", "Rainer Zufall", List.of(asset1, asset2));
 

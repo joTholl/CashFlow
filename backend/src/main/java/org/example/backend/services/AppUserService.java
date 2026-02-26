@@ -32,7 +32,8 @@ public class AppUserService {
             if (asset.ticker().equals(transaction.ticker())) {
                 Asset updatedAsset = asset
                         .withCost(asset.cost().add(costAndFee))
-                        .withShares(asset.shares().add(transaction.shares()));
+                        .withShares(asset.shares().add(transaction.shares()))
+                        .withAssetType(transaction.assetType());
                 assets.add(updatedAsset);
                 updated = true;
             } else {

@@ -62,6 +62,7 @@ public class FinnhubWebSocketClient implements WebSocket.Listener {
             if (finnhubResponse.data() != null) {
                 for (FinnhubResponseData finnhubResponseData : finnhubResponse.data()) {
                     livePriceStore.updatePrice(finnhubResponseData.s(), finnhubResponseData.p());
+                    LOGGER.info("Ticker: {} Price:{}", finnhubResponseData.s(), finnhubResponseData.p());//for debugging
                 }
             }
         } catch (Exception e) {
@@ -77,12 +78,14 @@ public class FinnhubWebSocketClient implements WebSocket.Listener {
 
             if (webSocket != null) {
                 sendSubscribe(symbol);
+                System.out.println(symbolsToSubscribe);
             }
         }
     }
 
     private void sendSubscribe(String symbol) {
-        String message = String.format("{'type':'subscribe','symbol':'%s'}", symbol);
+        String message = String.format("""
+                {"type":"subscribe","symbol":"%s"}""", symbol);
         webSocket.sendText(message, true);
     }
 
@@ -97,7 +100,8 @@ public class FinnhubWebSocketClient implements WebSocket.Listener {
     }
 
     private void sendUnsubscribe(String symbol) {
-        String message = String.format("{'type':'unsubscribe','symbol':'%s'}", symbol);
+        String message = String.format("""
+        {"type":"unsubscribe","symbol":"%s"}""", symbol);
         webSocket.sendText(message, true);
     }
 

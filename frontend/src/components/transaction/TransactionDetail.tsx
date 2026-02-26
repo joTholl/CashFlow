@@ -38,10 +38,11 @@ export default function TransactionDetail({loadUser}: Readonly<TransactionDetail
             <h4>Transaction Id: {transaction?.id}</h4>
             <p>Asset Name: {transaction?.assetName}</p>
             <p>Ticker: {transaction?.ticker}</p>
-            <p>Cost: {transaction?.cost} €</p>
+            <p>Cost: {transaction?.cost} $</p>
             <p>Shares: {transaction?.shares}</p>
-            <p>Fee: {transaction?.fee} €</p>
+            <p>Fee: {transaction?.fee} $</p>
             <p>Time: {transaction?.timestamp ? new Date(transaction?.timestamp).toISOString().slice(0, 16) : ""}</p>
+            <p>Asset Type: {transaction?.assetType}</p>
             <div className="buttons">
                 <button onClick={() => nav(`/transaction/update/${id}`)}>Edit Transaction</button>
                 <button onClick={() => deleteTransaction()}>Delete Transaction</button>

@@ -11,6 +11,10 @@ public class LivePriceStore {
     private final Map<String, BigDecimal> prices = new ConcurrentHashMap<>();
 
     public void updatePrice(String symbol, BigDecimal price) {
+        if (symbol.contains("BINANCE:")) {
+            symbol = symbol.replace("BINANCE:", "");
+            symbol = symbol.substring(0, symbol.length() - 4);
+        }
         prices.put(symbol, price);
     }
 

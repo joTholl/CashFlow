@@ -31,7 +31,7 @@ class FinnhubServiceTest {
 
     private FinnhubService finnhubService;
 
-    private final AppUser appUser1 = new AppUser("abc", "Rainer Zufall", List.of(new Asset("BINANCE:BTCUSDT", BigDecimal.valueOf(0.01), "Bitcoin", BigDecimal.valueOf(1000), AssetType.CRYPTO)));
+    private final AppUser appUser1 = new AppUser("abc", "Rainer Zufall", List.of(new Asset("BTC", BigDecimal.valueOf(0.01), "Bitcoin", BigDecimal.valueOf(1000), AssetType.CRYPTO)));
     private final AppUser appUser2 = new AppUser("abc", "Rainer Zufall", List.of(new Asset("MSFT", BigDecimal.valueOf(1), "Microsoft", BigDecimal.valueOf(200), AssetType.STOCK)));
 
     @BeforeEach
@@ -145,7 +145,7 @@ class FinnhubServiceTest {
                     }
                     ]
                 """, MediaType.APPLICATION_JSON));
-        finnhubService.addSymbol("BINANCE:BTCUSDT", AssetType.CRYPTO);
+        finnhubService.addSymbol("BTC", AssetType.CRYPTO);
         verify(finnhubWebSocketClient).addSymbol("BINANCE:BTCUSDT");
     }
 
@@ -155,7 +155,7 @@ class FinnhubServiceTest {
                 [
                 ]
                 """, MediaType.APPLICATION_JSON));
-        Exception e = assertThrows(SymbolNotFoundException.class, () -> finnhubService.addSymbol("BINANCE:BTCUSDT", AssetType.CRYPTO));
+        Exception e = assertThrows(SymbolNotFoundException.class, () -> finnhubService.addSymbol("BTC", AssetType.CRYPTO));
         verifyNoInteractions(finnhubWebSocketClient);
         assertEquals("Symbol not found: BINANCE:BTCUSDT", e.getMessage());
     }
