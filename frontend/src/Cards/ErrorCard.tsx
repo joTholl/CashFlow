@@ -4,7 +4,7 @@ type ErrorCardProps = {
     onClose: () => void; // Callback, um das Popup zu schließen
 }
 
-export default function ErrorCard({ errorMsg, onClose }: ErrorCardProps) {
+export default function ErrorCard({ errorMsg, onClose }: Readonly<ErrorCardProps>) {
     return (
         <div className="error-overlay">
             <div className="error-popup">
