@@ -1,3 +1,5 @@
+import AssetType from "./AssetType.ts";
+
 export type Transaction = {
     id: string,
     ticker: string,
@@ -5,5 +7,6 @@ export type Transaction = {
     cost: number,
     shares: number,
     timestamp: string,
-    fee: number
+    fee: number,
+    assetType: AssetType
 }

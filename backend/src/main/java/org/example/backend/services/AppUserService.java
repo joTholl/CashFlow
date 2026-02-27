@@ -32,7 +32,8 @@ public class AppUserService {
             if (asset.ticker().equals(transaction.ticker())) {
                 Asset updatedAsset = asset
                         .withCost(asset.cost().add(costAndFee))
-                        .withShares(asset.shares().add(transaction.shares()));
+                        .withShares(asset.shares().add(transaction.shares()))
+                        .withAssetType(transaction.assetType());
                 assets.add(updatedAsset);
                 updated = true;
             } else {
@@ -40,7 +41,7 @@ public class AppUserService {
             }
         }
         if (!updated) {
-            assets.add(new Asset(transaction.ticker(), transaction.shares(), transaction.assetName(), costAndFee));
+            assets.add(new Asset(transaction.ticker(), transaction.shares(), transaction.assetName(), costAndFee, transaction.assetType()));
         }
         appUserRepository.save(appUser.withAssets(assets));
     }
