@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react'
+import {useState} from 'react'
 import './styles/App.css'
 import Login from "./components/Login.tsx";
 import {Route, Routes} from "react-router-dom";
@@ -13,9 +13,7 @@ import TransactionUpdate from "./components/transaction/TransactionUpdate.tsx";
 import axios from "axios";
 import TransactionNew from "./components/transaction/TransactionNew.tsx";
 
-function subscribeSymbols() {
-    axios.post("/api/live", {});
-}
+
 
 function App() {
     const [user, setUser] = useState<string | undefined | null>(undefined)
@@ -30,9 +28,7 @@ function App() {
         })
             .catch(() => setUser(null))
     }
-    useEffect(() => {
-        subscribeSymbols();
-    }, []);
+
     return (
         <>
             <div className="navbar">

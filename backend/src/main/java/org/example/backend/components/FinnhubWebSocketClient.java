@@ -62,7 +62,6 @@ public class FinnhubWebSocketClient implements WebSocket.Listener {
             if (finnhubResponse.data() != null) {
                 for (FinnhubResponseData finnhubResponseData : finnhubResponse.data()) {
                     livePriceStore.updatePrice(finnhubResponseData.s(), finnhubResponseData.p());
-                    LOGGER.info("Ticker: {} Price:{}", finnhubResponseData.s(), finnhubResponseData.p());//for debugging
                 }
             }
         } catch (Exception e) {
@@ -85,6 +84,7 @@ public class FinnhubWebSocketClient implements WebSocket.Listener {
     private void sendSubscribe(String symbol) {
         String message = String.format("""
                 {"type":"subscribe","symbol":"%s"}""", symbol);
+        LOGGER.info(message);
         webSocket.sendText(message, true);
     }
 

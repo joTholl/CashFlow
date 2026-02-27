@@ -9,6 +9,9 @@ import axios from "axios";
 type DashboardProps = {
     user: AppUser
 }
+function subscribeSymbols() {
+    axios.post("/api/live", {});
+}
 
 export default function Dashboard({user}: Readonly<DashboardProps>) {
 
@@ -25,8 +28,8 @@ export default function Dashboard({user}: Readonly<DashboardProps>) {
     };
     useEffect(() => {
         fetchLoop();
+        subscribeSymbols();
     }, []);
-
     return (
 
             <div className="dashboard">
