@@ -1,5 +1,6 @@
 package org.example.backend.services;
 
+import static org.mockito.Mockito.*;
 import org.example.backend.dtos.TransactionInDto;
 import org.example.backend.dtos.TransactionOutDto;
 import org.example.backend.enums.AssetType;
@@ -18,7 +19,7 @@ import java.util.TimeZone;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
+
 
 class TransactionServiceTest {
 
