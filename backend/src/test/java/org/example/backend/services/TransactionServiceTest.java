@@ -1,6 +1,6 @@
 package org.example.backend.services;
 
-import static org.mockito.Mockito.*;
+
 import org.example.backend.dtos.TransactionInDto;
 import org.example.backend.dtos.TransactionOutDto;
 import org.example.backend.enums.AssetType;
@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.TimeZone;
+
+import static org.mockito.Mockito.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
