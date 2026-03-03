@@ -1,11 +1,11 @@
 package org.example.backend.services;
 
 import java.util.*;
+import org.example.backend.models.*;
 
 import org.example.backend.dtos.AppUserOutDto;
 import org.example.backend.dtos.TransactionOutDto;
 import org.example.backend.enums.AssetType;
-import org.example.backend.models.*;
 import org.example.backend.repositories.HistoricalRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
@@ -47,19 +47,23 @@ public class HistoricalService {
                 LocalDate from = LocalDate.now().minusYears(1);
                 EODHDResponse[] eodhdResponses = restClient.get().uri(ticker + "?from=" + from + "&to=" + to + "&period=d&fmt=json&api_token=" + System.getenv("EODHD_API_TOKEN")).retrieve().toEntity(EODHDResponse[].class).getBody();
                 Map<LocalDate, BigDecimal> closePrice = new HashMap<>();
-                for (EODHDResponse eodhdResponse : eodhdResponses) {
-                    closePrice.put(LocalDate.parse(eodhdResponse.date()), eodhdResponse.close());
-                }
-                for (LocalDate date = LocalDate.now().minusYears(1); date.isBefore(LocalDate.now()); date = date.plusDays(1)) {
-                    if (!closePrice.containsKey(date)) {
-                        try {
-                            closePrice.put(date, closePrice.get(date.minusDays(1)));
-                        } catch (Exception _) {
-                            closePrice.put(date, eodhdResponses[0].close());
-                        }
-                    }
-                }
+                fillClosePriceMap(eodhdResponses, closePrice);
                 historicalRepository.save(new HistoricalEntry(asset.ticker(), closePrice));
+            }
+        }
+    }
+
+    private void fillClosePriceMap(EODHDResponse[] eodhdResponses, Map<LocalDate, BigDecimal> closePrice) {
+        for (EODHDResponse eodhdResponse : eodhdResponses) {
+            closePrice.put(LocalDate.parse(eodhdResponse.date()), eodhdResponse.close());
+        }
+        for (LocalDate date = LocalDate.now().minusYears(1); date.isBefore(LocalDate.now()); date = date.plusDays(1)) {
+            if (!closePrice.containsKey(date)) {
+                try {
+                    closePrice.put(date, closePrice.get(date.minusDays(1)));
+                } catch (Exception _) {
+                    closePrice.put(date, eodhdResponses[0].close());
+                }
             }
         }
     }
