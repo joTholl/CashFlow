@@ -7,16 +7,18 @@ import org.example.backend.models.Asset;
 import org.example.backend.repositories.AppUserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.restclient.test.autoconfigure.AutoConfigureMockRestServiceServer;
+import org.springframework.boot.restclient.test.MockServerRestClientCustomizer;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
-import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.web.client.RestClient;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -28,9 +30,27 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@AutoConfigureMockRestServiceServer
-@AutoConfigureWebTestClient
 class FinnhubControllerTest {
+
+    @TestConfiguration()
+    static class TestContextConfiguration {
+        private final MockServerRestClientCustomizer customizer = new MockServerRestClientCustomizer();
+        private final RestClient.Builder customizedBuilder = RestClient.builder();
+
+        public TestContextConfiguration() {
+            customizer.customize(customizedBuilder);
+        }
+
+        @Bean
+        public RestClient.Builder restClientBuilder() {
+            return customizedBuilder;
+        }
+
+        @Bean
+        public MockRestServiceServer mockRestServiceServer() {
+            return customizer.getServer(customizedBuilder);
+        }
+    }
 
     @Autowired
     private MockMvc mockMvc;
@@ -40,8 +60,6 @@ class FinnhubControllerTest {
     private LivePriceStore livePriceStore;
     @Autowired
     private AppUserRepository appUserRepository;
-
-
 
 
     private final Asset asset1 = new Asset("BTC", BigDecimal.valueOf(0.001), "Bitcoin", BigDecimal.valueOf(100), AssetType.CRYPTO);
@@ -90,7 +108,7 @@ class FinnhubControllerTest {
                             }
                             ]
                         }""", MediaType.APPLICATION_JSON));
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/live").with(oidcLogin().userInfoToken(token-> token.claim("id", "abc"))))
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/live").with(oidcLogin().userInfoToken(token -> token.claim("id", "abc"))))
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
     }
