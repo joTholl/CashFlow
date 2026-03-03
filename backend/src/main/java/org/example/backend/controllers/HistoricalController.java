@@ -1,7 +1,7 @@
 package org.example.backend.controllers;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
 import lombok.RequiredArgsConstructor;
 import org.example.backend.models.ChartData;
 import org.example.backend.models.HistoricalEntry;
