@@ -1,6 +1,7 @@
 package org.example.backend.services;
 
 import java.util.*;
+
 import org.example.backend.models.*;
 
 import org.example.backend.dtos.AppUserOutDto;
@@ -21,11 +22,13 @@ public class HistoricalService {
     private final AppUserService appUserService;
     private final RestClient restClient;
     private final TransactionService transactionService;
+    private final HelperService helperService;
 
-    public HistoricalService(HistoricalRepository historicalRepository, AppUserService appUserService, TransactionService transactionService, RestClient.Builder restClientBuilder) {
+    public HistoricalService(HistoricalRepository historicalRepository, AppUserService appUserService, TransactionService transactionService, HelperService helperService, RestClient.Builder restClientBuilder) {
         this.historicalRepository = historicalRepository;
         this.appUserService = appUserService;
         this.transactionService = transactionService;
+        this.helperService = helperService;
         this.restClient = restClientBuilder.baseUrl("https://eodhd.com/api/eod/").build();
     }
 
@@ -33,18 +36,22 @@ public class HistoricalService {
         return historicalRepository.findAll();
     }
 
-    public void addHistoricalEntries(String id) {
+    public HistoricalEntry getHistoricalEntryByTicker(String ticker) {
+        return historicalRepository.findById(ticker).orElseThrow(() -> new NoSuchElementException("Ticker " + ticker + "  not found!"));
+    }
+
+    public void addHistoricalEntries(String userId) {
         List<HistoricalEntry> historicalEntries = historicalRepository.findAll();
         Map<String, HistoricalEntry> tickers = new HashMap<>();
+        LocalDate to = helperService.getLocalDateNow().minusDays(1);
+        LocalDate from = helperService.getLocalDateNow().minusYears(1);
         for (HistoricalEntry historicalEntry : historicalEntries) {
             tickers.put(historicalEntry.ticker(), historicalEntry);
         }
-        AppUserOutDto user = appUserService.getAppUser(id);
+        AppUserOutDto user = appUserService.getAppUser(userId);
         for (Asset asset : user.assets()) {
-            if (!tickers.containsKey(asset.ticker()) || !tickers.get(asset.ticker()).closePrice().containsKey(LocalDate.now().minusDays(1))) {
+            if (!tickers.containsKey(asset.ticker()) || !tickers.get(asset.ticker()).closePrice().containsKey(to)) {
                 String ticker = asset.assetType().equals(AssetType.CRYPTO) ? asset.ticker() + "-USD.CC" : asset.ticker() + ".US";
-                LocalDate to = LocalDate.now().minusDays(1);
-                LocalDate from = LocalDate.now().minusYears(1);
                 EODHDResponse[] eodhdResponses = restClient.get().uri(ticker + "?from=" + from + "&to=" + to + "&period=d&fmt=json&api_token=" + System.getenv("EODHD_API_TOKEN")).retrieve().toEntity(EODHDResponse[].class).getBody();
                 Map<LocalDate, BigDecimal> closePrice = new HashMap<>();
                 fillClosePriceMap(eodhdResponses, closePrice);
@@ -57,7 +64,7 @@ public class HistoricalService {
         for (EODHDResponse eodhdResponse : eodhdResponses) {
             closePrice.put(LocalDate.parse(eodhdResponse.date()), eodhdResponse.close());
         }
-        for (LocalDate date = LocalDate.now().minusYears(1); date.isBefore(LocalDate.now()); date = date.plusDays(1)) {
+        for (LocalDate date = helperService.getLocalDateNow().minusYears(1); date.isBefore(helperService.getLocalDateNow()); date = date.plusDays(1)) {
             if (!closePrice.containsKey(date)) {
                 try {
                     closePrice.put(date, closePrice.get(date.minusDays(1)));
@@ -68,20 +75,16 @@ public class HistoricalService {
         }
     }
 
-    public HistoricalEntry getHistoricalEntryByTicker(String ticker) {
-        return historicalRepository.findById(ticker).orElseThrow(() -> new NoSuchElementException("Ticker not found!"));
-    }
-
     public List<ChartData> getAllChartData() {
-        List<TransactionOutDto> tods = transactionService.getAllTransactions();
+        List<TransactionOutDto> tods = new ArrayList<>(transactionService.getAllTransactions());
         tods.sort(Comparator.comparing(TransactionOutDto::timestamp));
         Map<String, BigDecimal> shares = new HashMap<>();
         List<ChartData> chartDataList = new ArrayList<>();
-        LocalDate from = LocalDate.now().minusYears(1);
+        LocalDate from = helperService.getLocalDateNow().minusYears(1);
         ChartData firstChartData = new ChartData(from, BigDecimal.ZERO, BigDecimal.ZERO);
         for (TransactionOutDto tod : tods) {
             if (tod.timestamp().isBefore(from.atStartOfDay())) {
-                firstChartData = getChartData(shares, firstChartData, tod);
+                firstChartData = fillSharesAndChartData(shares, firstChartData, tod);
             } else {
                 break;
             }
@@ -90,22 +93,12 @@ public class HistoricalService {
         return chartDataList;
     }
 
-    private ChartData getChartData(Map<String, BigDecimal> shares, ChartData chartData, TransactionOutDto tod) {
-        if (shares.containsKey(tod.ticker())) {
-            shares.put(tod.ticker(), shares.get(tod.ticker()).add(tod.shares()));
-        } else {
-            shares.put(tod.ticker(), tod.shares());
-        }
-        chartData = chartData.withInvested(chartData.invested().add(tod.cost().add(tod.fee())));
-        return chartData;
-    }
-
     public List<ChartData> getChartDataByTicker(String ticker) {
-        List<TransactionOutDto> tods = transactionService.getAllTransactions();
+        List<TransactionOutDto> tods = new ArrayList<>(transactionService.getAllTransactions());
         tods.sort(Comparator.comparing(TransactionOutDto::timestamp));
         Map<String, BigDecimal> shares = new HashMap<>();
         List<ChartData> chartDataList = new ArrayList<>();
-        LocalDate from = LocalDate.now().minusYears(1);
+        LocalDate from = helperService.getLocalDateNow().minusYears(1);
         ChartData firstChartData = new ChartData(from, BigDecimal.ZERO, BigDecimal.ZERO);
         List<TransactionOutDto> filteredTods = new ArrayList<>();
         for (TransactionOutDto tod : tods) {
@@ -115,7 +108,7 @@ public class HistoricalService {
         }
         for (TransactionOutDto tod : filteredTods) {
             if (tod.timestamp().isBefore(from.atStartOfDay())) {
-                firstChartData = getChartData(shares, firstChartData, tod);
+                firstChartData = fillSharesAndChartData(shares, firstChartData, tod);
             } else {
                 break;
             }
@@ -125,28 +118,41 @@ public class HistoricalService {
 
     }
 
+    private ChartData fillSharesAndChartData(Map<String, BigDecimal> shares, ChartData chartData, TransactionOutDto tod) {
+        if (shares.containsKey(tod.ticker())) {
+            shares.put(tod.ticker(), shares.get(tod.ticker()).add(tod.shares()));
+        } else {
+            shares.put(tod.ticker(), tod.shares());
+        }
+        chartData = chartData.withInvested(chartData.invested().add(tod.cost().add(tod.fee())));
+        return chartData;
+    }
+
     private void addToChartDataList(List<ChartData> chartDataList, ChartData firstChartData, List<TransactionOutDto> tods, Map<String, BigDecimal> shares) {
-        LocalDate from = LocalDate.now().minusYears(1);
+        LocalDate from = helperService.getLocalDateNow().minusYears(1);
         ChartData chartData = new ChartData(from, BigDecimal.ZERO, BigDecimal.ZERO);
-        for (LocalDate date = from; date.isBefore(LocalDate.now()); date = date.plusDays(1)) {
+        for (LocalDate date = from; date.isBefore(helperService.getLocalDateNow()); date = date.plusDays(1)) {
             if (date.isEqual(from)) {
                 chartData = firstChartData;
             } else {
-                chartData = chartData.withDate(date);
+                chartData = new ChartData(date, chartData.invested(), BigDecimal.ZERO);
             }
             for (TransactionOutDto tod : tods) {
                 if (tod.timestamp().isAfter(date.plusDays(1).atStartOfDay())) {
                     break;
                 } else if (tod.timestamp().isBefore(date.plusDays(1).atStartOfDay()) &&
                         tod.timestamp().isAfter(date.atStartOfDay())) {
-                    chartData = getChartData(shares, chartData, tod);
+                    chartData = fillSharesAndChartData(shares, chartData, tod);
                 }
                 for (Map.Entry<String, BigDecimal> share : shares.entrySet()) {
-                    HistoricalEntry historicalEntry = getHistoricalEntryByTicker(share.getKey());
-                    chartData = chartData.withValue(share.getValue().multiply(historicalEntry.closePrice().get(date)).add(chartData.value()));
+                    if (share.getKey().equals(tod.ticker())) {
+                        HistoricalEntry historicalEntry = getHistoricalEntryByTicker(share.getKey());
+                        chartData = chartData.withValue(share.getValue().multiply(historicalEntry.closePrice().get(date)).add(chartData.value()));
+                    }
                 }
-                chartDataList.add(chartData);
+
             }
+            chartDataList.add(chartData);
         }
     }
 }

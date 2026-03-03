@@ -1,5 +1,6 @@
 package org.example.backend.controllers;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import lombok.RequiredArgsConstructor;
 import org.example.backend.models.ChartData;
@@ -23,14 +24,15 @@ public class HistoricalController {
         return historicalService.getAllHistoricalEntries();
     }
 
-    @PostMapping
-    public void addHistoricalEntries(@AuthenticationPrincipal OAuth2User user) {
-        historicalService.addHistoricalEntries(user.getAttribute("id").toString());
-    }
-
     @GetMapping("/{ticker}")
     public HistoricalEntry getHistoricalEntryByTicker(@PathVariable String ticker) {
         return historicalService.getHistoricalEntryByTicker(ticker);
+    }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public void addHistoricalEntries(@AuthenticationPrincipal OAuth2User user) {
+        historicalService.addHistoricalEntries(user.getAttribute("id").toString());
     }
 
     @GetMapping("/chart")
