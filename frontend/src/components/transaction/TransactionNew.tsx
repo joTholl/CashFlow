@@ -19,6 +19,7 @@ export default function TransactionNew({loadUser}: Readonly<TransactionNewProps>
     const [timestamp, setTimestamp] = useState<string>("");
     const [assetType, setAssetType] = useState<AssetType>("STOCK");
 
+
     function saveTransaction(e: SyntheticEvent<HTMLFormElement>) {
         e.preventDefault();
         const saveTransaction: TransactionIn = {ticker, assetName, cost, shares, timestamp, fee, assetType};
@@ -33,12 +34,13 @@ export default function TransactionNew({loadUser}: Readonly<TransactionNewProps>
 
     return (
 
-            <form onSubmit={saveTransaction} className="form">
-                <h3>New Transaction</h3>
-                <TransactionForm assetName={assetName} setAssetName={setAssetName} ticker={ticker} setTicker={setTicker}
-                                 cost={cost} setCost={setCost} shares={shares} setShares={setShares} fee={fee}
-                                 setFee={setFee} timestamp={timestamp} setTimestamp={setTimestamp} assetType={assetType} setAssetType={setAssetType} />
-            </form>
+        <form onSubmit={saveTransaction} className="form">
+            <h3>New Transaction</h3>
+            <TransactionForm assetName={assetName} setAssetName={setAssetName} ticker={ticker} setTicker={setTicker}
+                             cost={cost} setCost={setCost} shares={shares} setShares={setShares} fee={fee}
+                             setFee={setFee} timestamp={timestamp} setTimestamp={setTimestamp} assetType={assetType}
+                             setAssetType={setAssetType}/>
+        </form>
 
     )
 }

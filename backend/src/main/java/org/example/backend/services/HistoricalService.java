@@ -2,6 +2,7 @@ package org.example.backend.services;
 
 import java.util.*;
 
+import org.example.backend.components.LivePriceStore;
 import org.example.backend.models.*;
 
 import org.example.backend.dtos.AppUserOutDto;
@@ -13,6 +14,7 @@ import org.springframework.web.client.RestClient;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -23,13 +25,15 @@ public class HistoricalService {
     private final RestClient restClient;
     private final TransactionService transactionService;
     private final HelperService helperService;
+    private final LivePriceStore livePriceStore;
 
-    public HistoricalService(HistoricalRepository historicalRepository, AppUserService appUserService, TransactionService transactionService, HelperService helperService, RestClient.Builder restClientBuilder) {
+    public HistoricalService(HistoricalRepository historicalRepository, AppUserService appUserService, TransactionService transactionService, HelperService helperService, RestClient.Builder restClientBuilder, LivePriceStore livePriceStore) {
         this.historicalRepository = historicalRepository;
         this.appUserService = appUserService;
         this.transactionService = transactionService;
         this.helperService = helperService;
         this.restClient = restClientBuilder.baseUrl("https://eodhd.com/api/eod/").build();
+        this.livePriceStore = livePriceStore;
     }
 
     public List<HistoricalEntry> getAllHistoricalEntries() {
@@ -56,6 +60,7 @@ public class HistoricalService {
                 Map<LocalDate, BigDecimal> closePrice = new HashMap<>();
                 fillClosePriceMap(eodhdResponses, closePrice);
                 historicalRepository.save(new HistoricalEntry(asset.ticker(), closePrice));
+
             }
         }
     }
@@ -131,6 +136,8 @@ public class HistoricalService {
     private void addToChartDataList(List<ChartData> chartDataList, ChartData firstChartData, List<TransactionOutDto> tods, Map<String, BigDecimal> shares) {
         LocalDate from = helperService.getLocalDateNow().minusYears(1);
         ChartData chartData = new ChartData(from, BigDecimal.ZERO, BigDecimal.ZERO);
+        Map<String, HistoricalEntry> historicalEntryMap = getAllHistoricalEntries().stream().collect(Collectors.toMap(HistoricalEntry::ticker, entry -> entry));
+        livePriceStore.safeUpdatePrices(historicalEntryMap, helperService.getLocalDateNow().minusDays(1));
         for (LocalDate date = from; date.isBefore(helperService.getLocalDateNow()); date = date.plusDays(1)) {
             if (date.isEqual(from)) {
                 chartData = firstChartData;
@@ -144,13 +151,10 @@ public class HistoricalService {
                         tod.timestamp().isAfter(date.atStartOfDay())) {
                     chartData = fillSharesAndChartData(shares, chartData, tod);
                 }
-                for (Map.Entry<String, BigDecimal> share : shares.entrySet()) {
-                    if (share.getKey().equals(tod.ticker())) {
-                        HistoricalEntry historicalEntry = getHistoricalEntryByTicker(share.getKey());
-                        chartData = chartData.withValue(share.getValue().multiply(historicalEntry.closePrice().get(date)).add(chartData.value()));
-                    }
-                }
-
+            }
+            for (Map.Entry<String, BigDecimal> share : shares.entrySet()) {
+                HistoricalEntry historicalEntry = historicalEntryMap.get(share.getKey());
+                chartData = chartData.withValue(share.getValue().multiply(historicalEntry.closePrice().get(date)).add(chartData.value()));
             }
             chartDataList.add(chartData);
         }

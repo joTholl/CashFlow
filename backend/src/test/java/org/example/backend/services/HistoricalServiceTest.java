@@ -1,6 +1,8 @@
 package org.example.backend.services;
 
 import java.util.*;
+
+import org.example.backend.components.LivePriceStore;
 import org.example.backend.models.*;
 import org.example.backend.dtos.AppUserOutDto;
 import org.example.backend.dtos.TransactionOutDto;
@@ -12,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -29,11 +32,12 @@ class HistoricalServiceTest {
     private final AppUserService appUserService = mock(AppUserService.class);
     private final TransactionService transactionService = mock(TransactionService.class);
     private final HelperService helperService = mock(HelperService.class);
+    private final LivePriceStore livePriceStore = mock(LivePriceStore.class);
     private MockRestServiceServer mockServer;
     private HistoricalService historicalService;
 
-    private final HistoricalEntry historicalEntry1 = new HistoricalEntry("BTC", Map.of(LocalDate.parse("2026-03-02"), BigDecimal.valueOf(60000), LocalDate.parse("2026-03-01"), BigDecimal.valueOf(59000)));
-    private final HistoricalEntry historicalEntry2 = new HistoricalEntry("AAPL", Map.of(LocalDate.parse("2026-03-02"), BigDecimal.valueOf(400), LocalDate.parse("2026-03-01"), BigDecimal.valueOf(390)));
+    private final HistoricalEntry historicalEntry1 = new HistoricalEntry("BTC", Map.of(LocalDate.parse("2026-03-03"), BigDecimal.valueOf(61000), LocalDate.parse("2026-03-02"), BigDecimal.valueOf(60000), LocalDate.parse("2026-03-01"), BigDecimal.valueOf(59000)));
+    private final HistoricalEntry historicalEntry2 = new HistoricalEntry("AAPL", Map.of(LocalDate.parse("2026-03-03"), BigDecimal.valueOf(410), LocalDate.parse("2026-03-02"), BigDecimal.valueOf(400), LocalDate.parse("2026-03-01"), BigDecimal.valueOf(390)));
 
     private final AppUserOutDto appUserOutDto1 = new AppUserOutDto("Rainer Zufall", List.of(new Asset("BTC", BigDecimal.valueOf(0.01), "Bitcoin", BigDecimal.valueOf(1000), AssetType.CRYPTO), new Asset("AAPL", BigDecimal.valueOf(0.5), "Apple Inc.", BigDecimal.valueOf(200), AssetType.STOCK)));
 
@@ -44,7 +48,7 @@ class HistoricalServiceTest {
     void setUp() {
         RestClient.Builder restClientBuilder = RestClient.builder();
         mockServer = MockRestServiceServer.bindTo(restClientBuilder).build();
-        historicalService = new HistoricalService(historicalRepository, appUserService, transactionService, helperService, restClientBuilder);
+        historicalService = new HistoricalService(historicalRepository, appUserService, transactionService, helperService, restClientBuilder, livePriceStore);
     }
 
     @Test
@@ -74,31 +78,40 @@ class HistoricalServiceTest {
     void addHistoricalEntries_shouldAddAllAssets() {
         when(historicalRepository.findAll()).thenReturn(List.of(historicalEntry1, historicalEntry2));
         when(appUserService.getAppUser("abc")).thenReturn(appUserOutDto1);
-        when(helperService.getLocalDateNow()).thenReturn(LocalDate.parse("2026-03-04"));
-        mockServer.expect(requestTo("https://eodhd.com/api/eod/BTC-USD.CC?from=2025-03-04&to=2026-03-03&period=d&fmt=json&api_token=null"))
+        when(helperService.getLocalDateNow()).thenReturn(LocalDate.parse("2026-03-05"));
+        mockServer.expect(requestTo("https://eodhd.com/api/eod/BTC-USD.CC?from=2025-03-05&to=2026-03-04&period=d&fmt=json&api_token=null"))
                 .andRespond(withSuccess("""
                         [
                         {
                             "date":"2026-03-01",
                             "open":60050,
                             "high":60100,
-                            "low":59800,
-                            "close":60000,
+                            "low":58800,
+                            "close":59000,
                             "adjusted_close":60000,
                             "volume":264564656
                         },
                         {
                             "date":"2026-03-02",
+                            "open":59000,
+                            "high":60500,
+                            "low":58200,
+                            "close":60000,
+                            "adjusted_close":59100,
+                            "volume":26456456
+                        },
+                        {
+                            "date":"2026-03-03",
                             "open":60000,
                             "high":60000,
                             "low":58200,
-                            "close":59000,
-                            "adjusted_close":59100,
+                            "close":61000,
+                            "adjusted_close":60100,
                             "volume":26456456
                         }
                         ]
                         """, MediaType.APPLICATION_JSON));
-        mockServer.expect(requestTo("https://eodhd.com/api/eod/AAPL.US?from=2025-03-04&to=2026-03-03&period=d&fmt=json&api_token=null"))
+        mockServer.expect(requestTo("https://eodhd.com/api/eod/AAPL.US?from=2025-03-05&to=2026-03-04&period=d&fmt=json&api_token=null"))
                 .andRespond(withSuccess("""
                         [
                         {
@@ -106,7 +119,7 @@ class HistoricalServiceTest {
                             "open":420,
                             "high":450,
                             "low":380,
-                            "close":400,
+                            "close":390,
                             "adjusted_close":399,
                             "volume":658465
                         },
@@ -115,7 +128,16 @@ class HistoricalServiceTest {
                             "open":400,
                             "high":410,
                             "low":380,
-                            "close":390,
+                            "close":400,
+                            "adjusted_close":389,
+                            "volume":5645156
+                        },
+                        {
+                            "date":"2026-03-03",
+                            "open":400,
+                            "high":410,
+                            "low":380,
+                            "close":410,
                             "adjusted_close":389,
                             "volume":5645156
                         }
@@ -145,20 +167,22 @@ class HistoricalServiceTest {
     @Test
     void getAllChartData_shouldReturnChartData() {
         when(transactionService.getAllTransactions()).thenReturn(List.of(tod1, tod2));
-        when(helperService.getLocalDateNow()).thenReturn(LocalDate.parse("2026-03-03"));
-        when(historicalRepository.findById("BTC")).thenReturn(Optional.of(historicalEntry1));
-        when(historicalRepository.findById("AAPL")).thenReturn(Optional.of(historicalEntry2));
+        when(helperService.getLocalDateNow()).thenReturn(LocalDate.parse("2026-03-04"));
+        when(historicalRepository.findAll()).thenReturn(List.of(historicalEntry1, historicalEntry2));
         List<ChartData> chartData = historicalService.getAllChartData();
         verify(transactionService, times(1)).getAllTransactions();
         assertTrue(chartData.size() == 365 || chartData.size() == 366);
         for (int i = 0; i < chartData.size(); i++) {
-            if (i < chartData.size() - 2) {
+            if (i < chartData.size() - 3) {
                 assertTrue(Objects.equals(chartData.get(i).invested(), BigDecimal.ZERO) && Objects.equals(chartData.get(i).value(), BigDecimal.ZERO));
-            } else if (i == chartData.size() - 2) {
+            } else if (i == chartData.size() - 3) {
                 assertEquals(0, BigDecimal.valueOf(839).compareTo(chartData.get(i).value()));
                 assertEquals(0, BigDecimal.valueOf(500.3).compareTo(chartData.get(i).invested()));
-            } else if (i == chartData.size() - 1) {
+            } else if (i == chartData.size() - 2) {
                 assertEquals(0, BigDecimal.valueOf(860).compareTo(chartData.get(i).value()));
+                assertEquals(0, BigDecimal.valueOf(500.3).compareTo(chartData.get(i).invested()));
+            } else if (i == chartData.size() - 1) {
+                assertEquals(0, BigDecimal.valueOf(881).compareTo(chartData.get(i).value()));
                 assertEquals(0, BigDecimal.valueOf(500.3).compareTo(chartData.get(i).invested()));
             }
         }
@@ -167,19 +191,22 @@ class HistoricalServiceTest {
     @Test
     void getChartDataByTicker_shouldReturnChartData() {
         when(transactionService.getAllTransactions()).thenReturn(List.of(tod1, tod2));
-        when(helperService.getLocalDateNow()).thenReturn(LocalDate.parse("2026-03-03"));
-        when(historicalRepository.findById("BTC")).thenReturn(Optional.of(historicalEntry1));
+        when(helperService.getLocalDateNow()).thenReturn(LocalDate.parse("2026-03-04"));
+        when(historicalRepository.findAll()).thenReturn(List.of(historicalEntry1, historicalEntry2));
         List<ChartData> chartData = historicalService.getChartDataByTicker("BTC");
         verify(transactionService, times(1)).getAllTransactions();
         assertTrue(chartData.size() == 365 || chartData.size() == 366);
         for (int i = 0; i < chartData.size(); i++) {
-            if (i < chartData.size() - 2) {
+            if (i < chartData.size() - 3) {
                 assertTrue(Objects.equals(chartData.get(i).invested(), BigDecimal.ZERO) && Objects.equals(chartData.get(i).value(), BigDecimal.ZERO));
-            } else if (i == chartData.size() - 2) {
+            } else if (i == chartData.size() - 3) {
                 assertEquals(0, BigDecimal.valueOf(59).compareTo(chartData.get(i).value()));
                 assertEquals(0, BigDecimal.valueOf(100.1).compareTo(chartData.get(i).invested()));
-            } else if (i == chartData.size() - 1) {
+            } else if (i == chartData.size() - 2) {
                 assertEquals(0, BigDecimal.valueOf(60).compareTo(chartData.get(i).value()));
+                assertEquals(0, BigDecimal.valueOf(100.1).compareTo(chartData.get(i).invested()));
+            } else if (i == chartData.size() - 1) {
+                assertEquals(0, BigDecimal.valueOf(61).compareTo(chartData.get(i).value()));
                 assertEquals(0, BigDecimal.valueOf(100.1).compareTo(chartData.get(i).invested()));
             }
         }
