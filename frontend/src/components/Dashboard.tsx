@@ -6,6 +6,7 @@ import "../styles/Dashboard.css"
 import {type Dispatch, type SetStateAction, useEffect, useState} from "react";
 import axios from "axios";
 import type {ChartData} from "../models/ChartData.ts";
+import type {AssetWithLivePrices} from "../models/AssetWithLivePrices.ts";
 
 type DashboardProps = {
     user: AppUser
@@ -37,13 +38,48 @@ export default function Dashboard({user, chartData, setChartData}: Readonly<Dash
         subscribeSymbols();
     }, []);
 
+    const newAssets: AssetWithLivePrices[] = [];
+    let priceSum: number = 0;
+    for (const asset of user.assets) {
+        const newAsset: AssetWithLivePrices = {
+            asset: asset,
+            pricePerShare: livePrices[asset.ticker],
+            price: (livePrices[asset.ticker] * asset.shares),
+            percent: (livePrices[asset.ticker] * asset.shares - asset.cost) / asset.cost * 100
+        }
+        newAssets.push(newAsset);
+        priceSum += newAsset.price
+    }
+
+    useEffect(() => {
+        const today:string = new Date().toLocaleDateString().slice(0,-4);
+        setChartData(prev => {
+            if (prev.length === 0) return prev;
+            const last = prev[prev.length - 1];
+            if (last.date === today) {
+                return [
+                    ...prev.slice(0, -1),
+                    {...last, value: Number(priceSum.toFixed(2))}
+                ];
+            }
+            return [
+                ...prev,
+                {
+                    date: today,
+                    value: Number(priceSum.toFixed(2)),
+                    invested: Number(last.invested.toFixed(2))
+                }
+            ];
+        });
+    }, [priceSum]);
+
     return (
 
         <div className="dashboard">
             <h1>Dashboard von {user.username}</h1>
             <Chart chartData={chartData}/>
             <div className="components">
-                <Assets assets={user.assets} livePrices={livePrices} setChartData={setChartData}/>
+                <Assets assets={newAssets}/>
                 <Transactions/>
             </div>
         </div>

@@ -1,5 +1,5 @@
 import type {ChartData} from "../models/ChartData.ts";
-import { Legend, Line, LineChart, Tooltip, XAxis, YAxis} from "recharts";
+import {Legend, Line, LineChart, Tooltip, XAxis, YAxis} from "recharts";
 
 
 type ChartProps = {
@@ -10,7 +10,13 @@ function RechartsDevtools() {
     return null;
 }
 
-function CustomTooltip({ payload, label, active }:{payload:ChartData[], label:string, active:boolean}) {
+type CustomTooltipProps = {
+    payload: readonly ChartData[],
+    label: string,
+    active: boolean,
+}
+
+function CustomTooltip({payload, label, active}: Readonly<CustomTooltipProps>) {
     if (active && payload && payload.length) {
         return (
             <div
@@ -23,9 +29,9 @@ function CustomTooltip({ payload, label, active }:{payload:ChartData[], label:st
                     boxShadow: '1px 1px 2px #d88488',
                 }}
             >
-                <p className="label" style={{ margin: '0', fontWeight: '700' }}>{`${label}`}</p>
-                <p className="label" style={{ margin: '0', fontWeight: '700' }}>{`Invested: ${payload[0].value} $`}</p>
-                <p className="label" style={{ margin: '0', fontWeight: '700' }}>{`Value: ${payload[1].value} $`}</p>
+                <p className="label" style={{margin: '0', fontWeight: '700'}}>{`${label}`}</p>
+                <p className="label" style={{margin: '0', fontWeight: '700'}}>{`Invested: ${payload[0].value} $`}</p>
+                <p className="label" style={{margin: '0', fontWeight: '700'}}>{`Value: ${payload[1].value} $`}</p>
             </div>
         );
     }
@@ -49,7 +55,7 @@ export default function Chart({chartData}: Readonly<ChartProps>) {
             <Line type="monotone" dataKey="invested" stroke="white" strokeWidth={2} name="Invested"
                   dot={false}/>
             <XAxis dataKey="date"/>
-            <YAxis width="auto" label={{value: '$', position: 'insideLeft', }}/>
+            <YAxis width="auto" label={{value: '$', position: 'insideLeft',}}/>
             <Legend align="center"/>
             <Tooltip content={CustomTooltip} defaultIndex={2} active/>
             <RechartsDevtools/>
