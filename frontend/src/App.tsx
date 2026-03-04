@@ -31,19 +31,19 @@ function App() {
     }
 
     function updateChartData() {
-        axios.post("/api/historical").then(
-            () => axios.get("/api/historical/chart")
-                .then((response) =>
-                    setChartData(response.data.map((item: { date: string,value: number; invested: number; }) => ({
-                        ...item,
-                        date: new Date(item.date).toLocaleDateString().slice(0,-4),
-                        value: Number(item.value.toFixed(2)),
-                        invested: Number(item.invested.toFixed(2))
-                    })))
-                )
-                .catch((error) => {
-                    console.log(error)
-                }))
+        axios.post("/api/historical")
+            .catch((error) => {
+                console.log(error)
+            });
+        axios.get("/api/historical/chart")
+            .then((response) =>
+                setChartData(response.data.map((item: { date: string,value: number; invested: number; }) => ({
+                    ...item,
+                    date: new Date(item.date).toLocaleDateString().slice(0,-4),
+                    value: Number(item.value.toFixed(2)),
+                    invested: Number(item.invested.toFixed(2))
+                })))
+            )
             .catch((error) => {
                 console.log(error)
             });

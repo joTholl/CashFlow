@@ -17,7 +17,7 @@ type CustomTooltipProps = {
 }
 
 function CustomTooltip({payload, label, active}: Readonly<CustomTooltipProps>) {
-    if (active && payload && payload.length) {
+    if (active && payload?.length) {
         return (
             <div
                 className="custom-tooltip"
