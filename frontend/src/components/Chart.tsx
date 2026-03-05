@@ -11,9 +11,9 @@ function RechartsDevtools() {
 }
 
 type CustomTooltipProps = {
-    payload: readonly ChartData[],
-    label: string,
-    active: boolean,
+    payload?: readonly ChartData[],
+    label?: string | number| undefined,
+    active?: boolean,
 }
 
 function CustomTooltip({payload, label, active}: Readonly<CustomTooltipProps>) {
@@ -41,7 +41,9 @@ function CustomTooltip({payload, label, active}: Readonly<CustomTooltipProps>) {
 
 export default function Chart({chartData}: Readonly<ChartProps>) {
     let color: string
-    if (chartData.at(-1)?.invested > chartData.at(-1)?.value) {
+    const invested: number | undefined = chartData.at(-1)?.invested
+    const value: number | undefined = chartData.at(-1)?.value
+    if (invested && value && invested > value) {
         color = "red"
     } else {
         color = "green"

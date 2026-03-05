@@ -1,4 +1,4 @@
-import AssetType from "./AssetType.ts";
+import type {AssetType} from "./AssetType.ts";
 
 export type Transaction = {
     id: string,
