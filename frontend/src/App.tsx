@@ -28,20 +28,24 @@ function App() {
         axios.get("/api/auth")
             .then((response) => setUser(response.data))
             .then(() => axios.get("/api/appuser").then(response => setAppUser(response.data)))
-            .then(() => updateChartData())
+            .then(() => postChartData())
             .catch(() => setUser(null))
     }
 
-    function updateChartData() {
+    function postChartData() {
         axios.post("/api/historical")
             .catch((error) => {
                 console.log(error)
             });
+        getChartData();
+    }
+
+    function getChartData() {
         axios.get("/api/historical/chart")
             .then((response) =>
-                setChartData(response.data.map((item: { date: string,value: number; invested: number; }) => ({
+                setChartData(response.data.map((item: { date: string, value: number; invested: number; }) => ({
                     ...item,
-                    date: new Date(item.date).toLocaleDateString().slice(0,-4),
+                    date: new Date(item.date).toLocaleDateString().slice(0, -4),
                     value: Number(item.value.toFixed(2)),
                     invested: Number(item.invested.toFixed(2))
                 })))
@@ -62,13 +66,15 @@ function App() {
                 <Route path="/logout" element={<Logout/>}/>
                 <Route element={<ProtectedRoute user={user}/>}>
                     <Route path="/dashboard"
-                           element={<Dashboard user={appUser} chartData={chartData} setChartData={setChartData} livePrices={livePrices} setLivePrices={setLivePrices}/>}/>
+                           element={<Dashboard user={appUser} chartData={chartData} setChartData={setChartData}
+                                               livePrices={livePrices} setLivePrices={setLivePrices}/>}/>
                     <Route path="/newTransaction"
                            element={<TransactionNew loadUser={() => loadUser()}/>}/>
                     <Route path="/transaction/:id" element={<TransactionDetail loadUser={() => loadUser()}/>}/>
-                     <Route path="/transaction/update/:id"
+                    <Route path="/transaction/update/:id"
                            element={<TransactionUpdate loadUser={() => loadUser()}/>}/>
-                    <Route path="/asset/:ticker" element={<AssetDetail assets={appUser.assets} livePrices={livePrices}/>}/>
+                    <Route path="/asset/:ticker"
+                           element={<AssetDetail assets={appUser.assets} livePrices={livePrices} getChartData={getChartData}/>}/>
                 </Route>
             </Routes>
 
