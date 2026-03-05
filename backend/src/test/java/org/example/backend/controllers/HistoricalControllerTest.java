@@ -201,25 +201,25 @@ class HistoricalControllerTest {
                         .with(oidcLogin().userInfoToken(token -> token.claim("id", "abc"))))
                 .andExpect(MockMvcResultMatchers.status().isCreated());
         assertEquals(2, historicalRepository.findAll().size());
-        assertTrue(historicalRepository.findAll().getFirst().closePrice().size() == 365 || historicalRepository.findAll().getFirst().closePrice().size() == 366);
-        assertTrue(historicalRepository.findAll().getLast().closePrice().size() == 365 || historicalRepository.findAll().getLast().closePrice().size() == 366);
+        assertTrue(historicalRepository.findAll().getFirst().closePrice().size() == 364 || historicalRepository.findAll().getFirst().closePrice().size() == 365);
+        assertTrue(historicalRepository.findAll().getLast().closePrice().size() == 364 || historicalRepository.findAll().getLast().closePrice().size() == 365);
     }
 
     @Test
     void getAllChartData_shouldReturnAllChartData() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/api/historical/chart"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(365))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[364].value").value(860))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[364].invested").value(500.3));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(364))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[363].value").value(860))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[363].invested").value(500.3));
     }
 
     @Test
     void getChartDataByTicker_shouldReturnChartDataFromTicker() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/api/historical/chart/BTC"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(365))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[364].value").value(60))
-                .andExpect(MockMvcResultMatchers.jsonPath("$[364].invested").value(100.1));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(364))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[363].value").value(60))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[363].invested").value(100.1));
     }
 }

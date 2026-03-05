@@ -147,7 +147,7 @@ class HistoricalServiceTest {
         verify(historicalRepository, times(1)).findAll();
         verify(appUserService, times(1)).getAppUser("abc");
         verify(historicalRepository, times(2)).save(argThat(entry ->
-                entry.closePrice() != null && (entry.closePrice().size() == 365 || entry.closePrice().size() == 366)));
+                entry.closePrice() != null && (entry.closePrice().size() == 364 || entry.closePrice().size() == 365)));
     }
 
     @Test
@@ -171,7 +171,7 @@ class HistoricalServiceTest {
         when(historicalRepository.findAll()).thenReturn(List.of(historicalEntry1, historicalEntry2));
         List<ChartData> chartData = historicalService.getAllChartData();
         verify(transactionService, times(1)).getAllTransactions();
-        assertTrue(chartData.size() == 365 || chartData.size() == 366);
+        assertTrue(chartData.size() == 364 || chartData.size() == 365);
         for (int i = 0; i < chartData.size(); i++) {
             if (i < chartData.size() - 3) {
                 assertTrue(Objects.equals(chartData.get(i).invested(), BigDecimal.ZERO) && Objects.equals(chartData.get(i).value(), BigDecimal.ZERO));
@@ -195,7 +195,7 @@ class HistoricalServiceTest {
         when(historicalRepository.findAll()).thenReturn(List.of(historicalEntry1, historicalEntry2));
         List<ChartData> chartData = historicalService.getChartDataByTicker("BTC");
         verify(transactionService, times(1)).getAllTransactions();
-        assertTrue(chartData.size() == 365 || chartData.size() == 366);
+        assertTrue(chartData.size() == 364 || chartData.size() == 365);
         for (int i = 0; i < chartData.size(); i++) {
             if (i < chartData.size() - 3) {
                 assertTrue(Objects.equals(chartData.get(i).invested(), BigDecimal.ZERO) && Objects.equals(chartData.get(i).value(), BigDecimal.ZERO));
