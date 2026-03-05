@@ -13,12 +13,12 @@ type AssetDetailProps = {
 
 export default function AssetDetail({assets, livePrices}: Readonly<AssetDetailProps>) {
     const {ticker} = useParams<{ ticker: string }>();
-    const [chartData, setChartData] = useState<ChartData[]>([]);
+    const [singleChartData, setSingleChartData] = useState<ChartData[]>([]);
     const asset: Asset  = assets.find((asset) => asset?.ticker === ticker)!
     function getChartData() {
         axios.get("/api/historical/chart/" + ticker)
             .then((response) =>
-                setChartData(response.data.map((item: { date: string, value: number; invested: number; }) => ({
+                setSingleChartData(response.data.map((item: { date: string, value: number; invested: number; }) => ({
                     ...item,
                     date: new Date(item.date).toLocaleDateString().slice(0, -4),
                     value: Number(item.value.toFixed(2)),
@@ -37,7 +37,7 @@ export default function AssetDetail({assets, livePrices}: Readonly<AssetDetailPr
     useEffect(() => {
         const today:string = new Date().toLocaleDateString().slice(0,-4);
         // eslint-disable-next-line react-hooks/set-state-in-effect
-        setChartData(prev => {
+        setSingleChartData(prev => {
             if (prev.length === 0) return prev;
             const last = prev[prev.length - 1];
             if (last.date === today) {
@@ -61,7 +61,7 @@ export default function AssetDetail({assets, livePrices}: Readonly<AssetDetailPr
 
         <div className="dashboard">
             <h1>{asset.assetName} ({asset.ticker})</h1>
-            <Chart chartData={chartData}/>
+            <Chart chartData={singleChartData}/>
             <div className="components">
                 <div className="component">
                     <h2>Asset Details:</h2>
