@@ -12,7 +12,7 @@ function RechartsDevtools() {
 
 type CustomTooltipProps = {
     payload?: readonly ChartData[],
-    label?: string | number| undefined,
+    label?: string | number,
     active?: boolean,
 }
 
