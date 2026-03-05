@@ -31,17 +31,24 @@ export default function TransactionDetail({loadUser}: Readonly<TransactionDetail
     useEffect(() => {
         getTransaction();
     }, [id]);
-
+    const timestamp = transaction?.timestamp ? new Date(transaction?.timestamp).toLocaleString("de-DE", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+    }) : "";
     return (
         <div className="form">
             <h3>Transaction Details</h3>
             <h4>Transaction Id: {transaction?.id}</h4>
             <p>Asset Name: {transaction?.assetName}</p>
             <p>Ticker: {transaction?.ticker}</p>
-            <p>Cost: {transaction?.cost} €</p>
+            <p>Cost: {transaction?.cost} $</p>
             <p>Shares: {transaction?.shares}</p>
-            <p>Fee: {transaction?.fee} €</p>
-            <p>Time: {transaction?.timestamp ? new Date(transaction?.timestamp).toISOString().slice(0, 16) : ""}</p>
+            <p>Fee: {transaction?.fee} $</p>
+            <p>Time: {timestamp}</p>
+            <p>Asset Type: {transaction?.assetType}</p>
             <div className="buttons">
                 <button onClick={() => nav(`/transaction/update/${id}`)}>Edit Transaction</button>
                 <button onClick={() => deleteTransaction()}>Delete Transaction</button>

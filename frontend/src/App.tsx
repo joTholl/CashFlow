@@ -13,6 +13,8 @@ import TransactionUpdate from "./components/transaction/TransactionUpdate.tsx";
 import axios from "axios";
 import TransactionNew from "./components/transaction/TransactionNew.tsx";
 
+
+
 function App() {
     const [user, setUser] = useState<string | undefined | null>(undefined)
     const [appUser, setAppUser] = useState<AppUser>({
@@ -26,6 +28,7 @@ function App() {
         })
             .catch(() => setUser(null))
     }
+
     return (
         <>
             <div className="navbar">

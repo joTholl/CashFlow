@@ -1,6 +1,7 @@
 import {useNavigate} from "react-router-dom";
 import * as React from "react";
 import "../../styles/TransactionForm.css";
+import type {AssetType} from "../../models/AssetType.ts";
 
 type TransactionFormProps = {
     assetName: string, setAssetName: React.Dispatch<React.SetStateAction<string>>,
@@ -9,6 +10,7 @@ type TransactionFormProps = {
     shares: number, setShares: React.Dispatch<React.SetStateAction<number>>,
     fee: number, setFee: React.Dispatch<React.SetStateAction<number>>,
     timestamp: string, setTimestamp: React.Dispatch<React.SetStateAction<string>>;
+    assetType: AssetType, setAssetType: React.Dispatch<React.SetStateAction<AssetType>>,
 }
 
 export default function TransactionForm(props: Readonly<TransactionFormProps>) {
@@ -31,7 +33,7 @@ export default function TransactionForm(props: Readonly<TransactionFormProps>) {
                 <input type="number"
                        value={props.cost}
                        onChange={(e) => props.setCost(Number(e.target.value))}/>
-                {' '}€
+                {' '}$
             </label>
             <label>Shares:{' '}
                 <input type="number"
@@ -42,13 +44,21 @@ export default function TransactionForm(props: Readonly<TransactionFormProps>) {
                 <input type="number"
                        value={props.fee}
                        onChange={(e) => props.setFee(Number(e.target.value))}/>
-                {' '}€
+                {' '}$
             </label>
             <label>Timestamp:{' '}
                 <input
                     type="datetime-local"
                     value={props.timestamp ? new Date(props.timestamp).toISOString().slice(0, 16) : ""}
                     onChange={(e) => props.setTimestamp(new Date(e.target.value).toISOString())}/>
+            </label>
+            <label>Asset Type:{' '}
+                <select
+                    value={props.assetType}
+                    onChange={(e) => props.setAssetType(e.target.value as AssetType)}>
+                    <option value="STOCK">Stock</option>
+                    <option value="CRYPTO">Crypto</option>
+                </select>
             </label>
             <div className="buttons">
                 <button type={"submit"}> Save</button>

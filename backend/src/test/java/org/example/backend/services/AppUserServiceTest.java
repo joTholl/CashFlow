@@ -1,6 +1,7 @@
 package org.example.backend.services;
 
 import org.example.backend.dtos.AppUserOutDto;
+import org.example.backend.enums.AssetType;
 import org.example.backend.exceptions.UserNotLoggedInException;
 import org.example.backend.models.AppUser;
 import org.example.backend.models.Asset;
@@ -23,10 +24,10 @@ class AppUserServiceTest {
     private final AppUserService appUserService = new AppUserService(appUserRepository);
 
     private final AppUser appUser1 = new AppUser("abc", "Rainer Zufall", new ArrayList<>());
-    private final AppUser appUser2 = new AppUser("abc", "Rainer Zufall", List.of(new Asset("BTC", BigDecimal.valueOf(0.01), "Bitcoin", BigDecimal.valueOf(1000))));
+    private final AppUser appUser2 = new AppUser("abc", "Rainer Zufall", List.of(new Asset("BTC", BigDecimal.valueOf(0.01), "Bitcoin", BigDecimal.valueOf(1000), AssetType.CRYPTO)));
     private final AppUserOutDto appUserOutDto1 = new AppUserOutDto(appUser1);
 
-    private final Transaction transaction1 = new Transaction("zyx", "BTC", "Bitcoin", BigDecimal.valueOf(100), BigDecimal.valueOf(0.001), Instant.parse("2026-02-12T10:00:00.00Z"), BigDecimal.valueOf(0.1));
+    private final Transaction transaction1 = new Transaction("zyx", "BTC", "Bitcoin", BigDecimal.valueOf(100), BigDecimal.valueOf(0.001), Instant.parse("2026-02-12T10:00:00.00Z"), BigDecimal.valueOf(0.1), AssetType.CRYPTO);
 
     @Test
     void getAppUser_shouldReturnAppUser() {
