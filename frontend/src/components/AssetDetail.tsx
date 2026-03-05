@@ -1,6 +1,5 @@
 import {useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
-import axios from "axios";
 import Chart from "./Chart.tsx";
 import Transactions from "./transaction/Transactions.tsx";
 import type {Asset} from "../models/Asset.ts";
@@ -9,26 +8,13 @@ import type {ChartData} from "../models/ChartData.ts";
 type AssetDetailProps = {
     assets: Asset[];
     livePrices: Record<string, number>
+    getChartData: ()=> void;
 }
 
-export default function AssetDetail({assets, livePrices}: Readonly<AssetDetailProps>) {
+export default function AssetDetail({assets, livePrices, getChartData}: Readonly<AssetDetailProps>) {
     const {ticker} = useParams<{ ticker: string }>();
     const [chartData, setChartData] = useState<ChartData[]>([]);
     const asset: Asset  = assets.find((asset) => asset?.ticker === ticker)!
-    function getChartData() {
-        axios.get("/api/historical/chart/" + ticker)
-            .then((response) =>
-                setChartData(response.data.map((item: { date: string, value: number; invested: number; }) => ({
-                    ...item,
-                    date: new Date(item.date).toLocaleDateString().slice(0, -4),
-                    value: Number(item.value.toFixed(2)),
-                    invested: Number(item.invested.toFixed(2))
-                })))
-            )
-            .catch((error) => {
-                console.log(error)
-            });
-    }
 
     useEffect(() => {
         getChartData();
