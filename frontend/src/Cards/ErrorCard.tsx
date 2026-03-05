@@ -1,7 +1,7 @@
 
 type ErrorCardProps = {
     errorMsg: string;
-    onClose: () => void; // Callback, um das Popup zu schließen
+    onClose: () => void;
 }
 
 export default function ErrorCard({ errorMsg, onClose }: Readonly<ErrorCardProps>) {
