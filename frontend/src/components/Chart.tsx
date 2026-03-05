@@ -30,8 +30,8 @@ function CustomTooltip({payload, label, active}: Readonly<CustomTooltipProps>) {
                 }}
             >
                 <p className="label" style={{margin: '0', fontWeight: '700'}}>{`${label}`}</p>
-                <p className="label" style={{margin: '0', fontWeight: '700'}}>{`Invested: ${payload[0].value} $`}</p>
-                <p className="label" style={{margin: '0', fontWeight: '700'}}>{`Value: ${payload[1].value} $`}</p>
+                <p className="label" style={{margin: '0', fontWeight: '700'}}>{`Value: ${payload[0].value} $`}</p>
+                <p className="label" style={{margin: '0', fontWeight: '700'}}>{`Invested: ${payload[1].value} $`}</p>
             </div>
         );
     }

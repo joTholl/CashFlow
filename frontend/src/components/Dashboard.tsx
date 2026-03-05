@@ -3,7 +3,7 @@ import Assets from "./Assets.tsx";
 import type {AppUser} from "../models/AppUser.ts";
 import Transactions from "./transaction/Transactions.tsx";
 import "../styles/Dashboard.css"
-import {type Dispatch, type SetStateAction, useEffect, useState} from "react";
+import {type Dispatch, type SetStateAction, useEffect} from "react";
 import axios from "axios";
 import type {ChartData} from "../models/ChartData.ts";
 import type {AssetWithLivePrices} from "../models/AssetWithLivePrices.ts";
@@ -12,15 +12,17 @@ type DashboardProps = {
     user: AppUser
     chartData: ChartData[]
     setChartData: Dispatch<SetStateAction<ChartData[]>>
+    livePrices: Record<string, number>
+    setLivePrices: Dispatch<SetStateAction<Record<string, number>>>
 }
 
 function subscribeSymbols() {
     axios.post("/api/live", {});
 }
 
-export default function Dashboard({user, chartData, setChartData}: Readonly<DashboardProps>) {
+export default function Dashboard({user, chartData, setChartData, livePrices, setLivePrices}: Readonly<DashboardProps>) {
 
-    const [livePrices, setLivePrices] = useState<Record<string, number>>({});
+
 
     const fetchLoop = async () => {
         try {
@@ -76,7 +78,7 @@ export default function Dashboard({user, chartData, setChartData}: Readonly<Dash
     return (
 
         <div className="dashboard">
-            <h1>Dashboard von {user.username}</h1>
+            <h1>{user.username}'s Dashboard</h1>
             <Chart chartData={chartData}/>
             <div className="components">
                 <Assets assets={newAssets}/>

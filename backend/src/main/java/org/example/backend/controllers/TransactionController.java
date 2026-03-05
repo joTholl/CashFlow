@@ -24,6 +24,11 @@ public class TransactionController {
         return transactionService.getAllTransactions();
     }
 
+    @GetMapping("/ticker")
+    public List<TransactionOutDto> getAllTransactionsByTicker(@RequestParam String ticker) {
+        return transactionService.getAllTransactionsByTicker(ticker);
+    }
+
     @GetMapping("/{id}")
     public TransactionOutDto getTransactionById(@PathVariable String id) {
         return transactionService.getTransactionById(id);
