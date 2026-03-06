@@ -66,7 +66,7 @@ public class FinnhubWebSocketClient implements WebSocket.Listener {
                     livePriceStore.updatePrice(finnhubResponseData.s(), finnhubResponseData.p());
                 }
             }
-        } catch (Exception e) {
+        } catch (Exception _) {
             LOGGER.warn("Could not parse Finnhub response!");
         }
         webSocket.request(1);
