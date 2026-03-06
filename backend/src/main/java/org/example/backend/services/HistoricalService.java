@@ -69,7 +69,7 @@ public class HistoricalService {
         for (EODHDResponse eodhdResponse : eodhdResponses) {
             closePrice.put(LocalDate.parse(eodhdResponse.date()), eodhdResponse.close());
         }
-        for (LocalDate date = helperService.getLocalDateNow().minusYears(1); date.isBefore(helperService.getLocalDateNow()); date = date.plusDays(1)) {
+        for (LocalDate date = helperService.getLocalDateNow().minusYears(1).plusDays(1); date.isBefore(helperService.getLocalDateNow()); date = date.plusDays(1)) {
             if (!closePrice.containsKey(date)) {
                 try {
                     closePrice.put(date, closePrice.get(date.minusDays(1)));
@@ -85,7 +85,7 @@ public class HistoricalService {
         tods.sort(Comparator.comparing(TransactionOutDto::timestamp));
         Map<String, BigDecimal> shares = new HashMap<>();
         List<ChartData> chartDataList = new ArrayList<>();
-        LocalDate from = helperService.getLocalDateNow().minusYears(1);
+        LocalDate from = helperService.getLocalDateNow().minusYears(1).plusDays(1);
         ChartData firstChartData = new ChartData(from, BigDecimal.ZERO, BigDecimal.ZERO);
         for (TransactionOutDto tod : tods) {
             if (tod.timestamp().isBefore(from.atStartOfDay())) {
@@ -103,7 +103,7 @@ public class HistoricalService {
         tods.sort(Comparator.comparing(TransactionOutDto::timestamp));
         Map<String, BigDecimal> shares = new HashMap<>();
         List<ChartData> chartDataList = new ArrayList<>();
-        LocalDate from = helperService.getLocalDateNow().minusYears(1);
+        LocalDate from = helperService.getLocalDateNow().minusYears(1).plusDays(1);
         ChartData firstChartData = new ChartData(from, BigDecimal.ZERO, BigDecimal.ZERO);
         List<TransactionOutDto> filteredTods = new ArrayList<>();
         for (TransactionOutDto tod : tods) {
@@ -134,7 +134,7 @@ public class HistoricalService {
     }
 
     private void addToChartDataList(List<ChartData> chartDataList, ChartData firstChartData, List<TransactionOutDto> tods, Map<String, BigDecimal> shares) {
-        LocalDate from = helperService.getLocalDateNow().minusYears(1);
+        LocalDate from = helperService.getLocalDateNow().minusYears(1).plusDays(1);
         ChartData chartData = new ChartData(from, BigDecimal.ZERO, BigDecimal.ZERO);
         Map<String, HistoricalEntry> historicalEntryMap = getAllHistoricalEntries().stream().collect(Collectors.toMap(HistoricalEntry::ticker, entry -> entry));
         livePriceStore.safeUpdatePrices(historicalEntryMap, helperService.getLocalDateNow().minusDays(1));

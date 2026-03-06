@@ -4,11 +4,18 @@ import axios from "axios";
 import {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
 
+type TransactionsProps = {
+    ticker?: string;
+}
 
-export default function Transactions() {
+export default function Transactions({ticker}: Readonly<TransactionsProps>) {
     const nav = useNavigate();
+    let url: string = "/api/transactions";
+    if (ticker) {
+        url = url + "/ticker?ticker=" + ticker;
+    }
     const getTransactions = () => {
-        axios.get("/api/transactions").then((response) => {
+        axios.get(url).then((response) => {
             setTransactions(response.data);
         })
             .catch((error) => {
@@ -22,12 +29,13 @@ export default function Transactions() {
         getTransactions();
     }, []);
     return (
-            <div className="component">
-                <h2>Transactions:</h2>
-                <button onClick={()=>nav("/newTransaction")}>New Transaction</button>
-                <div className="content">
-                    {sortedTransactions.map(transaction => <TransactionCard key={transaction.id} transaction={transaction}/>)}
-                </div>
+        <div className="component">
+            <h2>Transactions:</h2>
+            <button onClick={() => nav("/newTransaction")}>New Transaction</button>
+            <div className="content">
+                {sortedTransactions.map(transaction => <TransactionCard key={transaction.id}
+                                                                        transaction={transaction}/>)}
             </div>
+        </div>
     )
 }

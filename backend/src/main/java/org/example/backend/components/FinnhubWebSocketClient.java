@@ -4,6 +4,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.example.backend.models.FinnhubResponse;
 import org.example.backend.models.FinnhubResponseData;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
 
@@ -32,13 +33,14 @@ public class FinnhubWebSocketClient implements WebSocket.Listener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FinnhubWebSocketClient.class.getName());
 
+    @Value("${FINNHUB_API_TOKEN}")
+    private String finnhubApiToken;
 
     @PostConstruct
     public void connect() {
-        final String finnhubToken = System.getenv("FINNHUB_API_TOKEN");
         String uri = "";
-        if (finnhubToken != null && !finnhubToken.isBlank()) {
-            uri = "wss://ws.finnhub.io?token=" + finnhubToken;
+        if (finnhubApiToken != null && !finnhubApiToken.isBlank()) {
+            uri = "wss://ws.finnhub.io?token=" + finnhubApiToken;
         }
         try {
             httpClient.newWebSocketBuilder()
@@ -64,8 +66,8 @@ public class FinnhubWebSocketClient implements WebSocket.Listener {
                     livePriceStore.updatePrice(finnhubResponseData.s(), finnhubResponseData.p());
                 }
             }
-        } catch (Exception e) {
-            LOGGER.warn("Could not parse Finnhub response:", e);
+        } catch (Exception _) {
+            LOGGER.warn("Could not parse Finnhub response!");
         }
         webSocket.request(1);
         return null;
@@ -134,3 +136,4 @@ public class FinnhubWebSocketClient implements WebSocket.Listener {
         CompletableFuture.delayedExecutor(5, TimeUnit.SECONDS).execute(this::connect);
     }
 }
+

@@ -3,7 +3,7 @@ import Assets from "./Assets.tsx";
 import type {AppUser} from "../models/AppUser.ts";
 import Transactions from "./transaction/Transactions.tsx";
 import "../styles/Dashboard.css"
-import {type Dispatch, type SetStateAction, useEffect, useState} from "react";
+import {type Dispatch, type SetStateAction, useEffect} from "react";
 import axios from "axios";
 import type {ChartData} from "../models/ChartData.ts";
 import type {AssetWithLivePrices} from "../models/AssetWithLivePrices.ts";
@@ -12,15 +12,17 @@ type DashboardProps = {
     user: AppUser
     chartData: ChartData[]
     setChartData: Dispatch<SetStateAction<ChartData[]>>
+    livePrices: Record<string, number>
+    setLivePrices: Dispatch<SetStateAction<Record<string, number>>>
 }
 
 function subscribeSymbols() {
     axios.post("/api/live", {});
 }
 
-export default function Dashboard({user, chartData, setChartData}: Readonly<DashboardProps>) {
+export default function Dashboard({user, chartData, setChartData, livePrices, setLivePrices}: Readonly<DashboardProps>) {
 
-    const [livePrices, setLivePrices] = useState<Record<string, number>>({});
+
 
     const fetchLoop = async () => {
         try {
@@ -39,7 +41,8 @@ export default function Dashboard({user, chartData, setChartData}: Readonly<Dash
     }, []);
 
     const newAssets: AssetWithLivePrices[] = [];
-    let priceSum: number = 0;
+    let valueSum: number = 0;
+    let investedSum: number = 0;
     for (const asset of user.assets) {
         const newAsset: AssetWithLivePrices = {
             asset: asset,
@@ -48,7 +51,8 @@ export default function Dashboard({user, chartData, setChartData}: Readonly<Dash
             percent: (livePrices[asset.ticker] * asset.shares - asset.cost) / asset.cost * 100
         }
         newAssets.push(newAsset);
-        priceSum += newAsset.price
+        investedSum += asset.cost;
+        valueSum += newAsset.price
     }
 
     useEffect(() => {
@@ -59,24 +63,24 @@ export default function Dashboard({user, chartData, setChartData}: Readonly<Dash
             if (last.date === today) {
                 return [
                     ...prev.slice(0, -1),
-                    {...last, value: Number(priceSum.toFixed(2))}
+                    {...last, value: Number(valueSum.toFixed(2))}
                 ];
             }
             return [
                 ...prev,
                 {
                     date: today,
-                    value: Number(priceSum.toFixed(2)),
-                    invested: Number(last.invested.toFixed(2))
+                    value: Number(valueSum.toFixed(2)),
+                    invested: Number(investedSum.toFixed(2))
                 }
             ];
         });
-    }, [priceSum]);
+    }, [valueSum]);
 
     return (
 
         <div className="dashboard">
-            <h1>Dashboard von {user.username}</h1>
+            <h1>{user.username}'s Dashboard</h1>
             <Chart chartData={chartData}/>
             <div className="components">
                 <Assets assets={newAssets}/>

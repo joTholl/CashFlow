@@ -23,7 +23,7 @@ export default function TransactionUpdate({loadUser}: Readonly<TransactionUpdate
     const [fee, setFee] = useState<number>(0);
     const [timestamp, setTimestamp] = useState<string>("");
     const [assetType, setAssetType] = useState<AssetType>("STOCK");
-    const [errorMsg, setErrorMsg] = useState<string | null>(null);
+    const [error, setError] = useState<string | null>(null);
 
     function getTransaction() {
         axios.get(`/api/transactions/${id}`).then((response) => {
@@ -36,19 +36,21 @@ export default function TransactionUpdate({loadUser}: Readonly<TransactionUpdate
         e.preventDefault();
         const updateTransaction: TransactionIn = {ticker, assetName, cost, shares, timestamp, fee, assetType};
         axios.put(`/api/transactions/${id}`, updateTransaction)
-            .then(()=>loadUser())
+            .then(() => loadUser())
             .then(() => nav("/dashboard"))
             .catch((error) => {
+                console.log(error);
                 if (axios.isAxiosError(error)) {
-                    setErrorMsg(error.response?.data || error.message);
+                    const msg =
+                        error.response?.data?.message ||
+                        error.response?.data ||
+                        error.message;
+
+                    setError(msg);
                 } else {
-                    setErrorMsg(String(error));
+                    setError("Unknown error occurred");
                 }
-                console.log(errorMsg);
             })
-    }
-    function handleClose() {
-        setErrorMsg(null);
     }
 
     useEffect(() => {
@@ -79,7 +81,9 @@ export default function TransactionUpdate({loadUser}: Readonly<TransactionUpdate
                                  setFee={setFee} timestamp={timestamp} setTimestamp={setTimestamp} assetType={assetType}
                                  setAssetType={setAssetType}/>
             </form>
-            {errorMsg && <ErrorCard errorMsg={errorMsg} onClose={handleClose}/>}
+
+            {error && (<ErrorCard errorMsg={error}/>)}
+
         </>
     )
 }

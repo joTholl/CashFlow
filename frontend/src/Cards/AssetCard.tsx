@@ -1,5 +1,6 @@
 import type {AssetWithLivePrices} from "../models/AssetWithLivePrices.ts";
 import {useEffect, useRef, useState} from "react";
+import {Link} from "react-router-dom";
 
 type AssetCardProps = {
     asset: AssetWithLivePrices
@@ -22,14 +23,16 @@ export default function AssetCard({asset}: Readonly<AssetCardProps>) {
     }, [asset]);
 
     return (
-        <div className="card">
-            <h4>{asset.asset.assetName} ({asset.asset.ticker})</h4>
-            <p>{asset.asset.shares} shares</p>
-            <p>{asset.asset.cost} $ invested</p>
-            <p className={colorClass}>{asset.pricePerShare?.toFixed(2)} $/Share</p>
-            <p className={asset.percent >= 0 ? "green" : "red"}>Value: {asset.price?.toFixed(2)} $</p>
-            <p className={asset.percent >= 0 ? "green" : "red"}>Value gained: {asset.percent?.toFixed(2)} %</p>
-        </div>
+        <Link to={`/asset/${asset.asset.ticker}`} className="link">
+            <div className="card">
+                <h4>{asset.asset.assetName} ({asset.asset.ticker})</h4>
+                <p>{asset.asset.shares} shares</p>
+                <p>{asset.asset.cost} $ invested</p>
+                <p className={colorClass}>{asset.pricePerShare?.toFixed(2)} $/Share</p>
+                <p className={asset.percent >= 0 ? "green" : "red"}>Value: {asset.price?.toFixed(2)} $</p>
+                <p className={asset.percent >= 0 ? "green" : "red"}>Value gained: {asset.percent?.toFixed(2)} %</p>
+            </div>
+        </Link>
 
     )
 }

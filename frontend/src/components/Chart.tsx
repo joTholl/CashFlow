@@ -30,8 +30,8 @@ function CustomTooltip({payload, label, active}: Readonly<CustomTooltipProps>) {
                 }}
             >
                 <p className="label" style={{margin: '0', fontWeight: '700'}}>{`${label}`}</p>
-                <p className="label" style={{margin: '0', fontWeight: '700'}}>{`Invested: ${payload[0].value} $`}</p>
-                <p className="label" style={{margin: '0', fontWeight: '700'}}>{`Value: ${payload[1].value} $`}</p>
+                <p className="label" style={{margin: '0', fontWeight: '700'}}>{`Value: ${payload[0].value} $`}</p>
+                <p className="label" style={{margin: '0', fontWeight: '700'}}>{`Invested: ${payload[1].value} $`}</p>
             </div>
         );
     }
@@ -57,7 +57,7 @@ export default function Chart({chartData}: Readonly<ChartProps>) {
             <Line type="monotone" dataKey="invested" stroke="white" strokeWidth={2} name="Invested"
                   dot={false}/>
             <XAxis dataKey="date"/>
-            <YAxis width="auto" label={{value: '$', position: 'insideLeft',}}/>
+            <YAxis width={50} label={{value: '$', position: 'insideLeft', offset:0}}/>
             <Legend align="center"/>
             <Tooltip content={CustomTooltip} defaultIndex={2} active/>
             <RechartsDevtools/>
