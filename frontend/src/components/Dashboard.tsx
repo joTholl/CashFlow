@@ -41,7 +41,8 @@ export default function Dashboard({user, chartData, setChartData, livePrices, se
     }, []);
 
     const newAssets: AssetWithLivePrices[] = [];
-    let priceSum: number = 0;
+    let valueSum: number = 0;
+    let investedSum: number = 0;
     for (const asset of user.assets) {
         const newAsset: AssetWithLivePrices = {
             asset: asset,
@@ -50,7 +51,8 @@ export default function Dashboard({user, chartData, setChartData, livePrices, se
             percent: (livePrices[asset.ticker] * asset.shares - asset.cost) / asset.cost * 100
         }
         newAssets.push(newAsset);
-        priceSum += newAsset.price
+        investedSum += asset.cost;
+        valueSum += newAsset.price
     }
 
     useEffect(() => {
@@ -61,19 +63,19 @@ export default function Dashboard({user, chartData, setChartData, livePrices, se
             if (last.date === today) {
                 return [
                     ...prev.slice(0, -1),
-                    {...last, value: Number(priceSum.toFixed(2))}
+                    {...last, value: Number(valueSum.toFixed(2))}
                 ];
             }
             return [
                 ...prev,
                 {
                     date: today,
-                    value: Number(priceSum.toFixed(2)),
-                    invested: Number(last.invested.toFixed(2))
+                    value: Number(valueSum.toFixed(2)),
+                    invested: Number(investedSum.toFixed(2))
                 }
             ];
         });
-    }, [priceSum]);
+    }, [valueSum]);
 
     return (
 

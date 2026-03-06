@@ -36,8 +36,8 @@ public class TransactionService {
     }
 
     public TransactionOutDto addTransaction(TransactionInDto tid, String userId) {
-        Transaction transaction = transactionRepository.save(new Transaction(helperService.getRandomId(), tid));
         finnhubService.addSymbol(tid.ticker(), tid.assetType());
+        Transaction transaction = transactionRepository.save(new Transaction(helperService.getRandomId(), tid));
         appUserService.addTransaction(transaction, userId);
         return new TransactionOutDto(transaction);
     }

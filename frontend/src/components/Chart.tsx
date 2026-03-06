@@ -57,7 +57,7 @@ export default function Chart({chartData}: Readonly<ChartProps>) {
             <Line type="monotone" dataKey="invested" stroke="white" strokeWidth={2} name="Invested"
                   dot={false}/>
             <XAxis dataKey="date"/>
-            <YAxis width="auto" label={{value: '$', position: 'insideLeft',}}/>
+            <YAxis width={50} label={{value: '$', position: 'insideLeft', offset:0}}/>
             <Legend align="center"/>
             <Tooltip content={CustomTooltip} defaultIndex={2} active/>
             <RechartsDevtools/>

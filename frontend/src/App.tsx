@@ -55,6 +55,7 @@ function App() {
             });
     }
 
+
     return (
         <>
             <div className="navbar">
@@ -74,7 +75,7 @@ function App() {
                     <Route path="/transaction/update/:id"
                            element={<TransactionUpdate loadUser={() => loadUser()}/>}/>
                     <Route path="/asset/:ticker"
-                           element={<AssetDetail assets={appUser.assets} livePrices={livePrices} getChartData={getChartData}/>}/>
+                           element={<AssetDetail assets={appUser.assets} livePrices={livePrices}/>}/>
                 </Route>
             </Routes>
 

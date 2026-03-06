@@ -67,7 +67,7 @@ public class FinnhubWebSocketClient implements WebSocket.Listener {
                 }
             }
         } catch (Exception e) {
-            LOGGER.warn("Could not parse Finnhub response:", e);
+            LOGGER.warn("Could not parse Finnhub response!");
         }
         webSocket.request(1);
         return null;

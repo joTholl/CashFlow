@@ -51,7 +51,7 @@ export default function AssetDetail({assets, livePrices}: Readonly<AssetDetailPr
                 {
                     date: today,
                     value: Number((livePrices[asset.ticker] * asset.shares).toFixed(2)),
-                    invested: Number(last.invested.toFixed(2))
+                    invested: Number(asset.cost.toFixed(2))
                 }
             ];
         });
