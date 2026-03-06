@@ -7,7 +7,7 @@ type ErrorCardProps = {
 export default function ErrorCard({ errorMsg}: Readonly<ErrorCardProps>) {
     return createPortal(
         <div className="error-overlay">
-            <div className="error-popup" onClick={(e) => e.stopPropagation()}>
+            <div className="error-popup">
                 <p>Error: {errorMsg}</p>
             </div>
         </div>,
