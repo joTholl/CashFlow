@@ -65,7 +65,7 @@ public class FinnhubWebSocketClient implements WebSocket.Listener {
                 }
             }
         } catch (Exception e) {
-            LOGGER.warn("Could not parse Finnhub response", e);
+            LOGGER.warn("Could not parse Finnhub response:", e);
         }
         webSocket.request(1);
         return null;
@@ -100,7 +100,7 @@ public class FinnhubWebSocketClient implements WebSocket.Listener {
 
     private void sendUnsubscribe(String symbol) {
         String message = String.format("""
-        {"type":"unsubscribe","symbol":"%s"}""", symbol);
+                {"type":"unsubscribe","symbol":"%s"}""", symbol);
         webSocket.sendText(message, true);
     }
 

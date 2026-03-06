@@ -9,15 +9,18 @@ import org.example.backend.repositories.TransactionRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.restclient.test.autoconfigure.AutoConfigureMockRestServiceServer;
+import org.springframework.boot.restclient.test.MockServerRestClientCustomizer;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.web.client.RestClient;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -32,12 +35,33 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 
 @AutoConfigureMockMvc
 @SpringBootTest
-@AutoConfigureMockRestServiceServer
 class TransactionControllerTest {
+
+
+    @TestConfiguration()
+    static class TestContextConfiguration {
+        private final MockServerRestClientCustomizer customizer = new MockServerRestClientCustomizer();
+        private final RestClient.Builder customizedBuilder = RestClient.builder();
+
+        public TestContextConfiguration() {
+            customizer.customize(customizedBuilder);
+        }
+
+        @Bean
+        public RestClient.Builder restClientBuilder() {
+            return customizedBuilder;
+        }
+
+        @Bean
+        public MockRestServiceServer mockRestServiceServer() {
+            return customizer.getServer(customizedBuilder);
+        }
+    }
+
     @Autowired
     private MockMvc mockMvc;
     @Autowired
-    private MockRestServiceServer mockServer;
+    public MockRestServiceServer mockServer;
     @Autowired
     private TransactionRepository transactionRepository;
     @Autowired
@@ -79,19 +103,19 @@ class TransactionControllerTest {
             """;
 
     private final String cryptoListJSON = """
-                        [
-                        {
-                                "description": "Binance LTC/USDT",
-                                "displaySymbol": "LTC/USDT",
-                                "symbol": "BINANCE:LTCUSDT"
-                            },
-                            {
-                                "description": "Binance BTC/USDT",
-                                "displaySymbol": "BTC/USDT",
-                                "symbol": "BINANCE:BTCUSDT"
-                            }
-                            ]
-                        """;
+            [
+            {
+                    "description": "Binance LTC/USDT",
+                    "displaySymbol": "LTC/USDT",
+                    "symbol": "BINANCE:LTCUSDT"
+                },
+                {
+                    "description": "Binance BTC/USDT",
+                    "displaySymbol": "BTC/USDT",
+                    "symbol": "BINANCE:BTCUSDT"
+                }
+                ]
+            """;
 
     @BeforeEach
     void setUp() {
@@ -226,6 +250,7 @@ class TransactionControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().json(newTransactionJSON));
     }
+
     @Test
     void updateTransaction_shouldUpdateStockTransaction() throws Exception {
         transactionRepository.save(transaction3);

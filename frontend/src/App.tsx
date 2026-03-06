@@ -12,21 +12,41 @@ import TransactionDetail from "./components/transaction/TransactionDetail.tsx";
 import TransactionUpdate from "./components/transaction/TransactionUpdate.tsx";
 import axios from "axios";
 import TransactionNew from "./components/transaction/TransactionNew.tsx";
-
+import type {ChartData} from "./models/ChartData.ts";
 
 
 function App() {
     const [user, setUser] = useState<string | undefined | null>(undefined)
+    const [chartData, setChartData] = useState<ChartData[]>([]);
     const [appUser, setAppUser] = useState<AppUser>({
         id: "", username: "", assets: []
     });
 
     const loadUser = () => {
-        axios.get("/api/auth").then((response) => {
-            setUser(response.data);
-            axios.get("/api/appuser").then(response => setAppUser(response.data))
-        })
+        axios.get("/api/auth")
+            .then((response) => setUser(response.data))
+            .then(() => axios.get("/api/appuser").then(response => setAppUser(response.data)))
+            .then(() => updateChartData())
             .catch(() => setUser(null))
+    }
+
+    function updateChartData() {
+        axios.post("/api/historical")
+            .catch((error) => {
+                console.log(error)
+            });
+        axios.get("/api/historical/chart")
+            .then((response) =>
+                setChartData(response.data.map((item: { date: string,value: number; invested: number; }) => ({
+                    ...item,
+                    date: new Date(item.date).toLocaleDateString().slice(0,-4),
+                    value: Number(item.value.toFixed(2)),
+                    invested: Number(item.invested.toFixed(2))
+                })))
+            )
+            .catch((error) => {
+                console.log(error)
+            });
     }
 
     return (
@@ -39,10 +59,13 @@ function App() {
                 <Route path="/" element={<Home/>}/>
                 <Route path="/logout" element={<Logout/>}/>
                 <Route element={<ProtectedRoute user={user}/>}>
-                    <Route path="/dashboard" element={<Dashboard user={appUser}/>}/>
-                    <Route path="/newTransaction" element={<TransactionNew loadUser={() => loadUser()}/>}/>
+                    <Route path="/dashboard"
+                           element={<Dashboard user={appUser} chartData={chartData} setChartData={setChartData}/>}/>
+                    <Route path="/newTransaction"
+                           element={<TransactionNew loadUser={() => loadUser()}/>}/>
                     <Route path="/transaction/:id" element={<TransactionDetail loadUser={() => loadUser()}/>}/>
-                    <Route path="/transaction/update/:id" element={<TransactionUpdate loadUser={() => loadUser()}/>}/>
+                    <Route path="/transaction/update/:id"
+                           element={<TransactionUpdate loadUser={() => loadUser()}/>}/>
                 </Route>
             </Routes>
 

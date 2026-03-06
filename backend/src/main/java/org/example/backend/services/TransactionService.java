@@ -23,9 +23,9 @@ public class TransactionService {
 
 
     public List<TransactionOutDto> getAllTransactions() {
-        List<Transaction>  transactions = transactionRepository.findAll();
+        List<Transaction> transactions = transactionRepository.findAll();
         List<TransactionOutDto> tods = new ArrayList<>();
-        for(Transaction transaction : transactions) {
+        for (Transaction transaction : transactions) {
             tods.add(new TransactionOutDto(transaction));
         }
         return tods;
@@ -37,7 +37,7 @@ public class TransactionService {
 
     public TransactionOutDto addTransaction(TransactionInDto tid, String userId) {
         Transaction transaction = transactionRepository.save(new Transaction(helperService.getRandomId(), tid));
-        finnhubService.addSymbol(tid.ticker(),tid.assetType());
+        finnhubService.addSymbol(tid.ticker(), tid.assetType());
         appUserService.addTransaction(transaction, userId);
         return new TransactionOutDto(transaction);
     }
@@ -51,7 +51,7 @@ public class TransactionService {
         } else {
             finnhubService.removeSymbol(transaction.ticker());
             appUserService.subtractTransaction(transaction, userId);
-            finnhubService.addSymbol(tid.ticker(),tid.assetType());
+            finnhubService.addSymbol(tid.ticker(), tid.assetType());
             appUserService.addTransaction(updateTransaction, userId);
         }
         return new TransactionOutDto(transactionRepository.save(updateTransaction));
